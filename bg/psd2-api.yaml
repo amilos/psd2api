@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: BG PSD2 API
   version: "1.2"
-  x-published: 2018-07-25
+  x-published: 2018-06-27
   description: |
     # Summary
     The **NextGenPSD2** *Framework Version 1.2* offers a modern, open, harmonised and interoperable set of 
@@ -4828,17 +4828,20 @@ components:
       description: |
         The first applicable day of execution starting from this date is the first payment.
       type: string
-      format: date-time
+      format: date
 
     endDate:
       description: |
         The last applicable day of execution
         If not given, it is an infinite standing order.
       type: string
-      format: date-time
+      format: date
 
     bookingDate:
-      $ref: "#/components/schemas/bookingDate"
+      description: |
+        The Date when an entry is posted to an account on the ASPSPs books.
+      type: string
+      format: date
 
     validUntil:
       description: |
