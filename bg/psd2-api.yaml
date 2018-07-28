@@ -2219,8 +2219,7 @@ paths:
       
       parameters:
       #path
-        - $ref: "#/components/parameters/paymentService"
-        - $ref: "#/components/parameters/paymentId"
+        - $ref: "#/components/parameters/consentId_PATH"
       #query # NO QUERY PARAMETER
       #header
           #common header parameter
@@ -2866,8 +2865,7 @@ paths:
       
       parameters:
       #path
-        - $ref: "#/components/parameters/paymentService"
-        - $ref: "#/components/parameters/paymentId"
+        - $ref: "#/components/parameters/basketId_PATH"
       #query # NO QUERY PARAMETER
       #header
           #common header parameter
