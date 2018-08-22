@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: BG PSD2 API
   version: "1.2"
-  x-published: 2018-06-27
+  x-published: 2018-08-17
   description: |
     # Summary
     The **NextGenPSD2** *Framework Version 1.2* offers a modern, open, harmonised and interoperable set of 
@@ -10214,7 +10214,7 @@ components:
       value:
         { 
           "scaStatus": "psuAuthenticated",
-          _links:{
+          _links: {
            "authoriseTransaction": {"href": "/v1/payments/1234-wertiq-983/authorisations/123auth456"}
           }
         }
