@@ -1,11 +1,11 @@
 openapi: 3.0.1
 info:
   title: BG PSD2 API
-  version: "1.2"
-  x-published: 2018-08-17
+  version: "1.3"
+  x-published: 2018-12-07
   description: |
     # Summary
-    The **NextGenPSD2** *Framework Version 1.2* offers a modern, open, harmonised and interoperable set of 
+    The **NextGenPSD2** *Framework Version 1.3* offers a modern, open, harmonised and interoperable set of 
     Application Programming Interfaces (APIs) as the safest and most efficient way to provide data securely. 
     The NextGenPSD2 Framework reduces XS2A complexity and costs, addresses the problem of multiple competing standards 
     in Europe and, aligned with the goals of the Euro Retail Payments Board,
@@ -228,7 +228,7 @@ paths:
         '503':
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
-  /v1/{payment-service}/{paymentId}:
+  /v1/{payment-service}/{payment-product}/{paymentId}:
 
     get:
       summary: Get Payment Information
@@ -253,6 +253,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"        
         - $ref: "#/components/parameters/paymentId"
       #query # NO QUERY PARAMETER
       #header
@@ -339,6 +340,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"        
         - $ref: "#/components/parameters/paymentId"
       #query # NO QUERY PARAMETER
       #header
@@ -393,7 +395,7 @@ paths:
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
 
-  /v1/{payment-service}/{paymentId}/status:
+  /v1/{payment-service}/{payment-product}/{paymentId}/status:
   
     get:
       summary: Payment initiation status request
@@ -420,6 +422,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"          
         - $ref: "#/components/parameters/paymentId"
       #query # NO QUERY PARAMETER
       #header
@@ -469,7 +472,7 @@ paths:
         '503':
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
-  /v1/{payment-service}/{paymentId}/authorisations:
+  /v1/{payment-service}/{payment-product}/{paymentId}/authorisations:
 
     post: 
       summary: Start the authorisation process for a payment initiation
@@ -527,6 +530,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"           
         - $ref: "#/components/parameters/paymentId"
       #query # NO QUERY PARAMETER
       #header
@@ -611,6 +615,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"          
         - $ref: "#/components/parameters/paymentId"
       #query # NO QUERY PARAMETER
       #header
@@ -661,7 +666,7 @@ paths:
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
 
-  /v1/{payment-service}/{paymentId}/authorisations/{authorisationId}:
+  /v1/{payment-service}/{payment-product}/{paymentId}/authorisations/{authorisationId}:
     
     get:
       summary: Read the SCA Status of the payment authorisation
@@ -690,6 +695,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"          
         - $ref: "#/components/parameters/paymentId"
         - $ref: "#/components/parameters/authorisationId"
       #query # NO QUERY PARAMETER
@@ -804,6 +810,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"          
         - $ref: "#/components/parameters/paymentId"
         - $ref: "#/components/parameters/authorisationId"
       #query # NO QUERY PARAMETER
@@ -878,7 +885,7 @@ paths:
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
 
-  /v1/{payment-service}/{paymentId}/cancellation-authorisations:
+  /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations:
 
     post: 
       summary: Start the authorisation process for the cancellation of the addressed payment
@@ -936,6 +943,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"          
         - $ref: "#/components/parameters/paymentId"
       #query # NO QUERY PARAMETER
       #header
@@ -1017,6 +1025,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"          
         - $ref: "#/components/parameters/paymentId"
       #query # NO QUERY PARAMETER
       #header
@@ -1067,7 +1076,7 @@ paths:
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
 
-  /v1/{payment-service}/{paymentId}/cancellation-authorisations/{cancellationId}:
+  /v1/{payment-service}/{payment-product}/{paymentId}/cancellation-authorisations/{cancellationId}:
 
     get:
       summary: Read the SCA status of the payment cancellation's authorisation.
@@ -1096,6 +1105,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"            
         - $ref: "#/components/parameters/paymentId"
         - $ref: "#/components/parameters/cancellationId"
       #query # NO QUERY PARAMETER
@@ -1213,6 +1223,7 @@ paths:
       parameters:
       #path
         - $ref: "#/components/parameters/paymentService"
+        - $ref: "#/components/parameters/paymentProduct"            
         - $ref: "#/components/parameters/paymentId"
         - $ref: "#/components/parameters/cancellationId"
       #query # NO QUERY PARAMETER
@@ -1736,13 +1747,424 @@ paths:
       # Card Accounts
       #####################################################
 
-#TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#  /card-accounts:
-#    
-#TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#    get:
-#      # Remark for Future: This endpoint will deliver credit card account related account information. It will be sub-structured analogously to the /accounts interface with similar sub-endpoints. Further details will be published with the next version of the specification.
-#      Remark: Note that the {card-account-id} parameters can be tokenised by the ASPSP such that the actual account numbers like IBANs or PANs are not part of the path definitions of the API for data protection reasons. This tokenisation is managed by the ASPSP
+  /v1/card-accounts:
+    get:
+      summary: Read Card Account List
+      description: | 
+        Reads a list of card accounts with additional information, e.g. balance information. It is
+        assumed that a consent of the PSU to this access is already given and stored on the ASPSP
+        system. The addressed list of card accounts depends then on the PSU ID and the stored
+        consent addressed by consentId, respectively the OAuth2 access token. 
+        
+      operationId: getCardAccountList
+      tags:
+        - Account Information Service (AIS)
+      
+      security:
+      ##################################################### 
+      # REMARKS ON SECURITY IN THIS OPENAPI FILE
+      #In this file only the basic security element to transport
+      # the bearer token of an an OAuth2 process, which has to 
+      # be included inthe HTTP header ist described.
+      #
+      # WARNING:
+      # If you want to use this file for a productive implementation, 
+      # it is recommandes to adjust the security schemes according to 
+      # your system enviroments and security policies.
+      #####################################################
+        - {}
+        - BearerAuthOAuth: []
+      
+      parameters:
+      #path # NO PATH PARAMETER
+      #query
+      #  - $ref: "#/components/parameters/withBalanceQuery"
+      #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #method specific header elements
+        - $ref: "#/components/parameters/consentId_HEADER_mandatory"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_CardAccountList"
+        
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/card-accounts/{account-id}:
+    get:
+      summary: Read Card Account Details
+      description: | 
+        Reads details about an card account.
+        It is assumed that a consent of the PSU to 
+        this access is already given and stored on the ASPSP system. 
+        The addressed details of this account depends then on the stored consent addressed by consentId, 
+        respectively the OAuth2 access token.
+        
+      operationId: readCardAccountDetails
+      tags:
+        - Account Information Service (AIS)
+      
+      security:
+      ##################################################### 
+      # REMARKS ON SECURITY IN THIS OPENAPI FILE
+      #In this file only the basic security element to transport
+      # the bearer token of an an OAuth2 process, which has to 
+      # be included inthe HTTP header ist described.
+      #
+      # WARNING:
+      # If you want to use this file for a productive implementation, 
+      # it is recommandes to adjust the security schemes according to 
+      # your system enviroments and security policies.
+      #####################################################
+        - {}
+        - BearerAuthOAuth: []
+      
+      parameters:
+      #path
+        - $ref: "#/components/parameters/accountId"
+      #query
+      #  - $ref: "#/components/parameters/withBalanceQuery"
+      #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #method specific header elements
+        - $ref: "#/components/parameters/consentId_HEADER_mandatory"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_CardAccountDetails"
+        
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/card-accounts/{account-id}/balances:
+
+    get:
+      summary: Read Card Account Balance
+      description: |
+        Reads card account data from a given account addressed by "account-id". 
+        
+        **Remark:** This account-id can be a tokenised identification due to data protection reason since the path 
+        information might be logged on intermediary servers within the ASPSP sphere. 
+        This account-id then can be retrieved by the "GET Card Account List" call.
+        
+        The account-id is constant at least throughout the lifecycle of a given consent.
+      operationId: getCardAccountBalances
+      tags:
+        - Account Information Service (AIS)
+      
+      security:
+      ##################################################### 
+      # REMARKS ON SECURITY IN THIS OPENAPI FILE
+      #In this file only the basic security element to transport
+      # the bearer token of an an OAuth2 process, which has to 
+      # be included inthe HTTP header ist described.
+      #
+      # WARNING:
+      # If you want to use this file for a productive implementation, 
+      # it is recommandes to adjust the security schemes according to 
+      # your system enviroments and security policies.
+      #####################################################
+        - {}
+        - BearerAuthOAuth: []
+      
+      parameters:
+      #path
+        - $ref: "#/components/parameters/accountId"
+      #query # NO QUERY PARAMETER
+      #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #method specific header elements
+        - $ref: "#/components/parameters/consentId_HEADER_mandatory"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_CardAccountBalances"
+        
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+  /v1/card-accounts/{account-id}/transactions/:
+    get:
+      summary: Read Card Transaction List
+      description: |
+        Read transaction reports or transaction lists of a given account ddressed by "account-id", depending on the steering parameter 
+        "bookingStatus" together with balances.
+        
+        For a given account, additional parameters are e.g. the attributes "dateFrom" and "dateTo". 
+        The ASPSP might add balance information, if transaction lists without balances are not supported.
+      operationId: getCardTransactionList
+      tags:
+        - Account Information Service (AIS)
+      
+      security:
+      ##################################################### 
+      # REMARKS ON SECURITY IN THIS OPENAPI FILE
+      #In this file only the basic security element to transport
+      # the bearer token of an an OAuth2 process, which has to 
+      # be included inthe HTTP header ist described.
+      #
+      # WARNING:
+      # If you want to use this file for a productive implementation, 
+      # it is recommandes to adjust the security schemes according to 
+      # your system enviroments and security policies.
+      #####################################################
+        - {}
+        - BearerAuthOAuth: []
+      
+      parameters:
+      #path
+        - $ref: "#/components/parameters/accountId"
+      #query
+        - $ref: "#/components/parameters/dateFrom"
+        - $ref: "#/components/parameters/dateTo"
+        - $ref: "#/components/parameters/entryReferenceFrom"
+        - $ref: "#/components/parameters/bookingStatus"
+        - $ref: "#/components/parameters/deltaList"
+        # - $ref: "#/components/parameters/withBalanceQuery"
+      #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #method specific header elements
+        - $ref: "#/components/parameters/consentId_HEADER_mandatory"
+        #- $ref: "#/components/parameters/Accept" #Can not defined in Open API. See general comments in the description attached to the top level of the file.
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_CardTransactions"
+        
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
+
+
+  /v1/card-accounts/{account-id}/transactions/{resourceId}: 
+    get:
+      summary: Read Card Transaction Details
+      description: |
+        Reads transaction details from a given transaction addressed by "resourceId" on a given card account addressed by "account-id". 
+        This call is only available on transactions as reported in a JSON format.
+        
+        **Remark:** Please note that the PATH might be already given in detail by the corresponding entry of the response of the 
+        "Read Transaction List" call within the _links subfield.
+      operationId: getCardTransactionDetails
+      tags:
+        - Account Information Service (AIS)
+      
+      security:
+      ##################################################### 
+      # REMARKS ON SECURITY IN THIS OPENAPI FILE
+      #In this file only the basic security element to transport
+      # the bearer token of an an OAuth2 process, which has to 
+      # be included inthe HTTP header ist described.
+      #
+      # WARNING:
+      # If you want to use this file for a productive implementation, 
+      # it is recommandes to adjust the security schemes according to 
+      # your system enviroments and security policies.
+      #####################################################
+        - {}
+        - BearerAuthOAuth: []
+      
+      parameters:
+      #path
+        - $ref: "#/components/parameters/accountId"
+        - $ref: "#/components/parameters/resourceId"
+      #query # NO QUERY PARAMETER
+      #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #method specific header elements
+        - $ref: "#/components/parameters/consentId_HEADER_mandatory"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      
+      responses:
+        '200':
+          $ref: "#/components/responses/OK_200_CardTransactionDetails"
+        
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
 
       #####################################################
@@ -2723,7 +3145,78 @@ paths:
           $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
         '503':
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
-
+    delete:
+      summary: Cancel a signing basket
+      description: Deletes a created signing basket if it is not yet (partially) authorised
+      operationId: deleteSigningBasket
+      tags:
+        - Signing Baskets
+      
+      security:
+      ##################################################### 
+      # REMARKS ON SECURITY IN THIS OPENAPI FILE
+      #In this file only the basic security element to transport
+      # the bearer token of an an OAuth2 process, which has to 
+      # be included inthe HTTP header ist described.
+      #
+      # WARNING:
+      # If you want to use this file for a productive implementation, 
+      # it is recommandes to adjust the security schemes according to 
+      # your system enviroments and security policies.
+      #####################################################
+        - {}
+        - BearerAuthOAuth: []
+      
+      parameters:
+      #path
+        - $ref: "#/components/parameters/basketId_PATH"
+      #query # NO QUERY PARAMETER
+      #header
+          #common header parameter
+        - $ref: "#/components/parameters/X-Request-ID"
+          #header to support the signature function
+        - $ref: "#/components/parameters/Digest"
+        - $ref: "#/components/parameters/Signature"
+        - $ref: "#/components/parameters/TPP-Signature-Certificate"
+          #optional additional PSU Information in header
+        - $ref: "#/components/parameters/PSU-IP-Address_optional"
+        - $ref: "#/components/parameters/PSU-IP-Port"
+        - $ref: "#/components/parameters/PSU-Accept"
+        - $ref: "#/components/parameters/PSU-Accept-Charset"
+        - $ref: "#/components/parameters/PSU-Accept-Encoding"
+        - $ref: "#/components/parameters/PSU-Accept-Language"
+        - $ref: "#/components/parameters/PSU-User-Agent"
+        - $ref: "#/components/parameters/PSU-Http-Method"
+        - $ref: "#/components/parameters/PSU-Device-ID"
+        - $ref: "#/components/parameters/PSU-Geo-Location"
+      #NO REQUEST BODY
+      
+      responses:
+        '204':
+          $ref: "#/components/responses/NO_CONTENT_204_SigningBaskets"
+        
+        '400':
+          $ref: "#/components/responses/BAD_REQUEST_400"
+        '401':
+          $ref: "#/components/responses/UNAUTHORIZED_401"
+        '403':
+          $ref: "#/components/responses/FORBIDDEN_403"
+        '404':
+          $ref: "#/components/responses/NOT_FOUND_404"
+        '405':
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405"
+        '406':
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406"
+        '408':
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408"
+        '415':
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415"
+        '429':
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429"
+        '500':
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500"
+        '503':
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503"
 
   /v1/signing-baskets/{basketId}/authorisations:
 
@@ -3233,18 +3726,18 @@ components:
       example: "123auth456"
 
 
-#TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#    cardTransactionId:
-#      description: Unique end to end identity.
-#      type: string
-#      maxLength: 35
+# TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
+    cardTransactionId:
+      description: Unique end to end identity.
+      type: string
+      maxLength: 35
 
 
-#TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#    terminalId:
-#      description: Terminal ID
-#      type: string 
-#      maxLength: 35
+# TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
+    terminalId:
+      description: Terminal ID
+      type: string 
+      maxLength: 35
 
 
     entryReference:
@@ -3254,10 +3747,10 @@ components:
       maxLength: 35
 
 
-#TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#    merchantCategoryCode:
-#      description: Merchant category code
-#      type: string
+# TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
+    merchantCategoryCode:
+      description: Merchant category code
+      type: string
 
 
     transactionStatus:
@@ -3306,6 +3799,10 @@ components:
         - "CANC"
       example: "ACCP"
 
+    fundsAvailable:
+      description: Equals true if sufficient funds are available at the time of the request, false otherwise. This data element is contained, if supported by the ASPSP, if a funds check has been  performed and if the transactionStatus is "ATCT", "ACWC" or "ACCP".
+      type: boolean
+
     scaStatus:
       description: |
         This data element is containing information about the status of the SCA method applied. 
@@ -3343,23 +3840,23 @@ components:
         
       example: "psuAuthenticated"
 
-#TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#    cardTransactionStatus: #TODO  CARD-ACCOUNTS No final definition of cardTransactionStatus in spec contained. Has to be added later.
-#      description: |
-#        No final detaileddefinition in spec contained
-#        "booked", 
-#        "pending"###
-#        structure: two lists
-#      type: object
-#      properties:
-#        booked:
-#          type: array
-#          items:
-#            type: string
-#        pending:
-#          type: array
-#          items:
-#            type: string
+# TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
+    cardTransactionStatus: #TODO  CARD-ACCOUNTS No final definition of cardTransactionStatus in spec contained. Has to be added later.
+      description: |
+        No final detaileddefinition in spec contained
+        "booked", 
+        "pending"###
+        structure: two lists
+      type: object
+      properties:
+        booked:
+          type: array
+          items:
+            type: string
+        pending:
+          type: array
+          items:
+            type: string
 
     scaAuthenticationData:
       description: |
@@ -3422,7 +3919,10 @@ components:
         The ASPSP will follow this preference according to contracts agreed on with the PSU.
       type: boolean
       example: false
-      
+    
+
+
+
     scaMethods:
       description: |
         This data element might be contained, if SCA is required and if the PSU has a choice between different
@@ -3479,6 +3979,7 @@ components:
       required:
         - authenticationType
         - authenticationMethodId
+        - name
       properties:
         authenticationType:
           $ref: "#/components/schemas/authenticationType"
@@ -3536,8 +4037,10 @@ components:
             This attribute is used only, when PHOTO_OTP or CHIP_OTP
             is the selected SCA method.
         data:
-          type: string
-          description: String challenge data
+          type: array
+          description: A collection of challenge data          
+          items:
+            type: string
         imageLink:
           type: string
           format: url
@@ -3564,6 +4067,78 @@ components:
       example: "/v1/payments/sepa-credit-transfers/1234-wertiq-983"
 
 
+
+
+    problemTypeTextUnspecific:
+      description: A URI reference [RFC3986] that identifies the problem type. 
+      type: string
+      maxLength: 70      
+      enum:
+        - "https://berlingroup.com/error-codes/CERTIFICATE_INVALID"
+        - "https://berlingroup.com/error-codes/CERTIFICATE_EXPIRED"
+        - "https://berlingroup.com/error-codes/CERTIFICATE_BLOCKED"
+        - "https://berlingroup.com/error-codes/CERTIFICATE_REVOKED"
+        - "https://berlingroup.com/error-codes/CERTIFICATE_MISSING"
+        - "https://berlingroup.com/error-codes/SIGNATURE_INVALID"
+        - "https://berlingroup.com/error-codes/SIGNATURE_MISSING"
+        - "https://berlingroup.com/error-codes/FORMAT_ERROR"
+        - "https://berlingroup.com/error-codes/PARAMETER_NOT_CONSISTENT"          
+        - "https://berlingroup.com/error-codes/PARAMETER_NOT_SUPPORTED"
+        - "https://berlingroup.com/error-codes/PSU_CREDENTIALS_INVALID"
+        - "https://berlingroup.com/error-codes/SERVICE_INVALID"
+        - "https://berlingroup.com/error-codes/SERVICE_BLOCKED"
+        - "https://berlingroup.com/error-codes/CORPORATE_ID_INVALID"
+        - "https://berlingroup.com/error-codes/CONSENT_UNKNOWN"
+        - "https://berlingroup.com/error-codes/CONSENT_INVALID"
+        - "https://berlingroup.com/error-codes/CONSENT_EXPIRED"
+        - "https://berlingroup.com/error-codes/TOKEN_UNKNOWN"
+        - "https://berlingroup.com/error-codes/TOKEN_INVALID"
+        - "https://berlingroup.com/error-codes/TOKEN_EXPIRED"
+        - "https://berlingroup.com/error-codes/RESOURCE_UNKNOWN"
+        - "https://berlingroup.com/error-codes/RESOURCE_EXPIRED"
+        - "https://berlingroup.com/error-codes/RESOURCE_BLOCKED"        
+        - "https://berlingroup.com/error-codes/TIMESTAMP_INVALID"
+        - "https://berlingroup.com/error-codes/PERIOD_INVALID"
+        - "https://berlingroup.com/error-codes/SCA_METHOD_UNKNOWN"
+        - "https://berlingroup.com/error-codes/STATUS_INVALID"        
+
+    problemTypeTextPisSpecific:
+      description: A URI reference [RFC3986] that identifies the problem type. 
+      type: string
+      maxLength: 70   
+      enum:
+        - "https://berlingroup.com/error-codes/PRODUCT_INVALID"
+        - "https://berlingroup.com/error-codes/PRODUCT_UNKNOWN"
+        - "https://berlingroup.com/error-codes/PAYMENT_FAILED"
+        - "https://berlingroup.com/error-codes/REQUIRED_KID_MISSING"
+        - "https://berlingroup.com/error-codes/EXECUTION_DATE_INVALID"
+
+    problemTypeTextAisSpecific:
+      description: A URI reference [RFC3986] that identifies the problem type. 
+      type: string
+      maxLength: 70   
+      enum:
+        - "https://berlingroup.com/error-codes/CONSENT_INVALID"
+        - "https://berlingroup.com/error-codes/SESSIONS_NOT_SUPPORTED"
+        - "https://berlingroup.com/error-codes/ACCESS_EXCEEDED"
+        - "https://berlingroup.com/error-codes/REQUESTED_FORMATS_INVALID"
+
+    problemTypeTextPiisSpecific:
+      description: A URI reference [RFC3986] that identifies the problem type. 
+      type: string
+      maxLength: 70   
+      enum:
+        - "https://berlingroup.com/error-codes/CARD_INVALID"
+        - "https://berlingroup.com/error-codes/NO_PIIS_ACTIVATION"
+
+    problemTypeTextSbSpecific:
+      description: A URI reference [RFC3986] that identifies the problem type. 
+      type: string
+      maxLength: 70   
+      enum:
+        - "https://berlingroup.com/error-codes/REFERENCE_MIX_INVALID"
+        - "https://berlingroup.com/error-codes/REFERENCE_STATUS_INVALID"
+
     messageCodeTextUnspecific:
       type: string
       enum:
@@ -3575,7 +4150,8 @@ components:
         - "SIGNATURE_INVALID"
         - "SIGNATURE_MISSING"
         - "FORMAT_ERROR"
-        - "PARAMETER_NOT_SUPPORTED"
+        - "PARAMETER_NOT_CONSISTENT"
+        - "PARAMETER_NOT_SUPPORTED"        
         - "PSU_CREDENTIALS_INVALID"
         - "SERVICE_INVALID"
         - "SERVICE_BLOCKED"
@@ -3588,9 +4164,11 @@ components:
         - "TOKEN_EXPIRED"
         - "RESOURCE_UNKNOWN"
         - "RESOURCE_EXPIRED"
+        - "RESOURCE_BLOCKED"        
         - "TIMESTAMP_INVALID"
         - "PERIOD_INVALID"
         - "SCA_METHOD_UNKNOWN"
+        - "STATUS_INVALID"
 
     messageCodeTextPisSpecific:
       type: string
@@ -3614,6 +4192,12 @@ components:
       enum:
         - "CARD_INVALID"
         - "NO_PIIS_ACTIVATION"
+
+    messageCodeTextSbSpecific:
+      type: string
+      enum:
+        - "REFERENCE_MIX_INVALID"
+        - "REFERENCE_STATUS_INVALID"        
 
     authorisationsList:
       description: An array of all authorisationIds 
@@ -3715,8 +4299,6 @@ components:
               - not yet invoiced but already booked entries and
               - pending items (not yet booked)
             
-          - "authorised":
-            The expected balance together with the value of a pre-approved credit line the ASPSP makes permanently available to the user.
             
             For card-accounts:
             
@@ -3743,7 +4325,6 @@ components:
       enum:
           - "closingBooked"
           - "expected"
-          - "authorised"
           - "openingBooked"
           - "interimAvailable"
           - "forwardAvailable"
@@ -3804,11 +4385,18 @@ components:
           description: |
             Optional if supported by API provider.
             
-            Only the values "allAccounts" or "allAccountsWithBalances" is admitted.
+            Only the values "allAccounts" is admitted.
           type: string
           enum:
             - "allAccounts"
-            - "allAccountsWithBalances"
+        availableAccountsWithBalance:
+          description: |
+            Optional if supported by API provider.
+            
+            Only the values "allAccounts" is admitted.
+          type: string
+          enum:
+            - "allAccounts"        
         allPsd2:
           description: |
             Optional if supported by API provider.
@@ -3900,63 +4488,63 @@ components:
           $ref: "#/components/schemas/_linksAccountDetails"
 
 
-#TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#    cardAccountDetails:
-#      description: |
-#        The ASPSP shall give at least one of the account reference identifiers:
-#          - pan
-#          - maskedPan
-#      type: object
-#      properties:
-#        resourceId:
-#          description: This shall be filled, if addressable resource are created by the ASPSP on the /accounts or /card-accounts endpoint.
-#          type: string
-#          maxLength: 35
-#        pan:
-#          $ref: "#/components/schemas/pan"
-#        maskedPan:
-#          $ref: "#/components/schemas/maskedPan"
-#        currency:
-#          $ref: "#/components/schemas/currencyCode"
-#        name:
-#          description: Name of the account given by the bank or the PSU in online-banking.
-#          type: string
-#          maxLength: 35
-#        product:
-#          description: Product name of the bank for this account, proprietary definition.
-#          type: string
-#          maxLength: 35
-#        cardAccountType:
-#          $ref: "#/components/schemas/cashAccountType"
-#        status:
-#          $ref: "#/components/schemas/accountStatus"
-#        linkedAccounts:
-#          description: Case of a set of pending card transactions, the APSP will provide the relevant cash account the card is set up on.
-#          type: string
-#          maxLength: 70
-#        usage:
-#          description: |
-#            Specifies the usage of the account
-#              * PRIV: private personal account
-#              * ORGA: professional account
-#          type: string
-#          maxLength: 140
-#          enum:
-#            - "PRIV"
-#            - "ORGA"
-#        details:
-#          description: |
-#            Specifications that might be provided by the ASPSP
-#              - characteristics of the account
-#              - characteristics of the relevant card
-#          type: string
-#          maxLength: 140
-#        creditLimit:
-#          $ref: "#/components/schemas/amount"
-#        balances:
-#          $ref: "#/components/schemas/balanceList"
-#        _links:
-#          $ref: "#/components/schemas/_linksAccountDetails"
+
+    cardAccountDetails:
+      description: |
+        The ASPSP shall give at least one of the account reference identifiers:
+          - pan
+          - maskedPan
+      type: object
+      properties:
+        resourceId:
+          description: This shall be filled, if addressable resource are created by the ASPSP on the /accounts or /card-accounts endpoint.
+          type: string
+          maxLength: 35
+        pan:
+          $ref: "#/components/schemas/pan"
+        maskedPan:
+          $ref: "#/components/schemas/maskedPan"
+        currency:
+          $ref: "#/components/schemas/currencyCode"
+        name:
+          description: Name of the account given by the bank or the PSU in online-banking.
+          type: string
+          maxLength: 35
+        product:
+          description: Product name of the bank for this account, proprietary definition.
+          type: string
+          maxLength: 35
+        cardAccountType:
+          $ref: "#/components/schemas/cashAccountType"
+        status:
+          $ref: "#/components/schemas/accountStatus"
+        linkedAccounts:
+          description: Case of a set of pending card transactions, the APSP will provide the relevant cash account the card is set up on.
+          type: string
+          maxLength: 70
+        usage:
+          description: |
+            Specifies the usage of the account
+              * PRIV: private personal account
+              * ORGA: professional account
+          type: string
+          maxLength: 140
+          enum:
+            - "PRIV"
+            - "ORGA"
+        details:
+          description: |
+            Specifications that might be provided by the ASPSP
+              - characteristics of the account
+              - characteristics of the relevant card
+          type: string
+          maxLength: 140
+        creditLimit:
+          $ref: "#/components/schemas/amount"
+        balances:
+          $ref: "#/components/schemas/balanceList"
+        _links:
+          $ref: "#/components/schemas/_linksAccountDetails"
 
 
     accountList:
@@ -3970,6 +4558,18 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/accountDetails"
+
+    cardAccountList:
+      description: |
+        List of accounts with details.
+      type: object
+      required:
+        - cardAccounts
+      properties:
+        cardAccounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/cardAccountDetails"            
 
 
     accountReport:
@@ -3986,6 +4586,19 @@ components:
         _links:
           $ref: "#/components/schemas/_linksAccountReport"
 
+    cardAccountReport:
+      description: JSON based account report.
+      type: object
+      required:
+        - booked
+        - _links
+      properties:
+        booked:
+          $ref: "#/components/schemas/cardTransactionList"
+        pending:
+          $ref: "#/components/schemas/cardTransactionList"
+        _links:
+          $ref: "#/components/schemas/_linksAccountReport"
 
     transactionList:
       description: Array of transaction details
@@ -3993,6 +4606,11 @@ components:
       items: 
         $ref: "#/components/schemas/transactionDetails"
 
+    cardTransactionList:
+      description: Array of transaction details
+      type: array
+      items: 
+        $ref: "#/components/schemas/cardTransactionDetails"
 
     transactionDetails:
       description: Transaction details
@@ -4060,6 +4678,8 @@ components:
             - $ref: "#/components/schemas/accountReferenceMsisdn"
         ultimateDebtor:
           $ref: "#/components/schemas/ultimateDebtor"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"          
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -4081,52 +4701,52 @@ components:
 
 
 #TODO INCLUDED FOR LATER USE WITH CARD-ACCOUNTS
-#    cardTransaction:
-#      description: TODO CARD-ACCOUNTS Description cardTransaction
-#      type: object
-#      required: 
-#        - transactionAmount
-#      properties:
-#        entryReference:
-#          $ref: "#/components/schemas/entryReference" 
-#        cardTransactionId:
-#          $ref: "#/components/schemas/cardTransactionId"
-#        terminalId:
-#          $ref: "#/components/schemas/terminalId"
-#        transactionDate:
-#          $ref: "#/components/schemas/transactionDate"
-#        bookingDate:
-#          $ref: "#/components/schemas/bookingDate"
-#        transactionAmount:
-#          $ref: "#/components/schemas/amount"
-#        exchangeRate:
-#          $ref: "#/components/schemas/exchangeRateList"
-#        instructedAmount:
-#          $ref: "#/components/schemas/amount"
-#        markupFee:
-#          $ref: "#/components/schemas/amount" #TODO CARD-ACCOUNTS Check Type. NO Type for markupFee in Spec. defined
-#        cardAcceptorId:
-#          type: string
-#          maxLength: 35
-#        cardAcceptorAddress:
-#          $ref: "#/components/schemas/address" 
-#        merchantCategoryCode:
-#          $ref: "#/components/schemas/merchantCategoryCode" 
-#        maskedPAN:
-#          $ref: "#/components/schemas/maskedPan"
-#        PAN:
-#          $ref: "#/components/schemas/pan"
-#        transactionDetails:
-#          type: string
-#          maxLength: 140
-#          #TODO CARD-ACCOUNTS Check At other places there is a complex type.
-#        status:
-#          $ref: "#/components/schemas/cardTransactionStatus"
-#          #TODO CARD-ACCOUNTS No final definition of cardTransactionStatus in spec contained
-#        invoiced:
-#          type: boolean
-#        proprietaryBankTransactionCode:
-#          $ref: "#/components/schemas/proprietaryBankTransactionCode"
+    cardTransactionDetails:
+      description: TODO CARD-ACCOUNTS Description cardTransaction
+      type: object
+      required: 
+        - transactionAmount
+      properties:
+        entryReference:
+          $ref: "#/components/schemas/entryReference" 
+        cardTransactionId:
+          $ref: "#/components/schemas/cardTransactionId"
+        terminalId:
+          $ref: "#/components/schemas/terminalId"
+        transactionDate:
+          $ref: "#/components/schemas/transactionDate"
+        bookingDate:
+          $ref: "#/components/schemas/bookingDate"
+        transactionAmount:
+          $ref: "#/components/schemas/amount"
+        exchangeRate:
+          $ref: "#/components/schemas/exchangeRateList"
+        instructedAmount:
+          $ref: "#/components/schemas/amount"
+        markupFee:
+          $ref: "#/components/schemas/amount" #TODO CARD-ACCOUNTS Check Type. NO Type for markupFee in Spec. defined
+        cardAcceptorId:
+          type: string
+          maxLength: 35
+        cardAcceptorAddress:
+          $ref: "#/components/schemas/address" 
+        merchantCategoryCode:
+          $ref: "#/components/schemas/merchantCategoryCode" 
+        maskedPAN:
+          $ref: "#/components/schemas/maskedPan"
+        PAN:
+          $ref: "#/components/schemas/pan"
+        transactionDetails:
+          type: string
+          maxLength: 140
+          #TODO CARD-ACCOUNTS Check At other places there is a complex type.
+        status:
+          $ref: "#/components/schemas/cardTransactionStatus"
+          #TODO CARD-ACCOUNTS No final definition of cardTransactionStatus in spec contained
+        invoiced:
+          type: boolean
+        proprietaryBankTransactionCode:
+          $ref: "#/components/schemas/proprietaryBankTransactionCode"
 
     exchangeRateList:
       description: Array of exchange rates
@@ -4147,16 +4767,18 @@ components:
       properties:
         currencyFrom:
           $ref: "#/components/schemas/currencyCode"
-        rateFrom:
+        rate:
+          description: |
+            "Defines the exchange rate, where the currencyFrom is set to the unit currency
+            e.g. currencyFrom=USD, currencyTo=EUR: 1 USD = 0.8 EUR and 0.8 is the rate."
           type: string
         currencyTo:
           $ref: "#/components/schemas/currencyCode"
-        rateTo:
-          type: string
         rateDate:
           type: string
           format: date
         rateContract:
+          description: Reference to a rate contract
           type: string
 
 
@@ -4173,6 +4795,10 @@ components:
           $ref: "#/components/schemas/amount"
         balanceType:
           $ref: "#/components/schemas/balanceType"
+        creditLimitIncluded:
+          description: |
+            A flag indicating if the credit limit of the corresponding account is included in the calculation of the balance, where applicable.
+          type: boolean
         lastChangeDateTime:
           description: |
             This data element might be used to indicate e.g. with the expected or booked balance that no action is known 
@@ -4777,12 +5403,13 @@ components:
     psuData:
       description: PSU Data for Update PSU Authentication.
       type: object
-      required:
-        - password
       properties:
         password:
           description: Password
           type: string
+        encryptedPassword:
+          description: Used when a password is encrypted on application level.
+          type: string          
 
     psuMessageText:
       description: Text to be displayed to the PSU
@@ -4801,6 +5428,15 @@ components:
       maxLength: 70
       example: "Debtor Name"
 
+    chargeBearer:
+      description: This is following ChargeBearerType1Code from ISO20022
+      type: string
+      enum:
+        - DEBT
+        - CRED
+        - SHAR
+        - SLEV
+        
     ultimateDebtor:
       description: Ultimate Debtor
       type: string
@@ -5013,6 +5649,8 @@ components:
           $ref: "#/components/schemas/creditorName"
         creditorAddress:
           $ref: "#/components/schemas/address"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
 #        ultimateCreditor: # N.A.
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode: # N.A.
@@ -5070,6 +5708,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode:  # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -5193,6 +5833,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode: # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -5232,6 +5874,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode:  # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -5413,6 +6057,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode: # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured:
           type: string
           maxLength: 140
@@ -5479,6 +6125,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode:  # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -5850,6 +6498,10 @@ components:
       properties:
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
+
+
 
 
     paymentInitiationStatusResponse-200_xml:
@@ -5875,6 +6527,8 @@ components:
       properties:
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
         paymentId:
           $ref: "#/components/schemas/paymentId"
         transactionFees:
@@ -5907,6 +6561,8 @@ components:
       properties:
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
         paymentId:
           $ref: "#/components/schemas/paymentId"
         transactionFees:
@@ -5994,6 +6650,8 @@ components:
 #          format: date-time
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
     paymentInitiationSctInstWithStatusResponse:
       description: |
@@ -6049,6 +6707,8 @@ components:
 #          format: date-time
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
     paymentInitiationTarget2WithStatusResponse:
       description: |
@@ -6092,6 +6752,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode: # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -6105,6 +6767,8 @@ components:
 #          format: date-time
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     paymentInitiationCrossBorderWithStatusResponse:
@@ -6148,6 +6812,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode:  # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -6161,6 +6827,8 @@ components:
 #          format: date-time
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     periodicPaymentInitiationSctWithStatusResponse:
@@ -6229,6 +6897,8 @@ components:
           $ref: "#/components/schemas/dayOfExecution"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     periodicPaymentInitiationSctInstWithStatusResponse:
@@ -6297,6 +6967,8 @@ components:
           $ref: "#/components/schemas/dayOfExecution"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     periodicPaymentInitiationTarget2WithStatusResponse:
@@ -6367,6 +7039,8 @@ components:
           $ref: "#/components/schemas/dayOfExecution"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     periodicPaymentInitiationCrossBorderWithStatusResponse:
@@ -6412,6 +7086,8 @@ components:
 #          $ref: "#/components/schemas/ultimateCreditor"
 #        purposeCode:  # N.A.
 #          $ref: "#/components/schemas/purposeCode"
+        chargeBearer:
+          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured: 
           type: string
           maxLength: 140
@@ -6436,6 +7112,8 @@ components:
           $ref: "#/components/schemas/dayOfExecution"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     bulkPaymentInitiationSctWithStatusResponse:
@@ -6465,6 +7143,8 @@ components:
             $ref: "#/components/schemas/paymentInitiationSct_json"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     bulkPaymentInitiationSctInstWithStatusResponse:
@@ -6494,6 +7174,8 @@ components:
             $ref: "#/components/schemas/paymentInitiationSctInst_json"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
     bulkPaymentInitiationTarget2WithStatusResponse:
       description: |
@@ -6522,6 +7204,8 @@ components:
             $ref: "#/components/schemas/paymentInitiationTarget2_json"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
 
     bulkPaymentInitiationCrossBorderWithStatusResponse: 
@@ -6551,6 +7235,8 @@ components:
             $ref: "#/components/schemas/paymentInitiationCrossBorder_json"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
+        fundsAvailable:
+          $ref: "#/components/schemas/fundsAvailable"    
 
     scaStatusResponse:
       description: Body of the JSON response with SCA Status
@@ -6569,6 +7255,8 @@ components:
       properties:
         scaStatus:
           $ref: "#/components/schemas/scaStatus"
+        authorisationId:
+          $ref: "#/components/schemas/authorisationId"        
         scaMethods:
           $ref: "#/components/schemas/scaMethods"
         chosenScaMethod:
@@ -6756,6 +7444,36 @@ components:
         balances:
           $ref: "#/components/schemas/balanceList"
 
+    readCardAccountBalanceResponse-200:
+      description: Body of the response for a successful read balance request.
+      type: object
+      required:
+        - balances
+      properties:
+        cardAccount:
+          oneOf:
+            - $ref: "#/components/schemas/accountReferencePan"
+            - $ref: "#/components/schemas/accountReferenceMaskedPan"
+
+        balances:
+          $ref: "#/components/schemas/balanceList"          
+
+
+    cardTransactionsResponse-200:
+      description: Body of the JSON response for a successful read card transaction list request.
+      type: object
+      properties:
+        cardAccount:
+          oneOf:
+            - $ref: "#/components/schemas/accountReferencePan"
+            - $ref: "#/components/schemas/accountReferenceMaskedPan"
+        transactions:
+          $ref: "#/components/schemas/cardAccountReport"
+        balances:
+          $ref: "#/components/schemas/balanceList"
+        _links:
+          $ref: "#/components/schemas/_linksDownload"
+          
     transactionsResponse-200_json:
       description: Body of the JSON response for a successful read transaction list request.
       type: object
@@ -7286,6 +8004,82 @@ components:
           $ref: "#/components/schemas/hrefType"
 
 #####################################################
+# Problem Details
+#####################################################
+
+    problemDetails:
+      description: Standardised definition of error report according to RFC7807
+      properties:
+        type:
+          anyOf:
+            - $ref: "#/components/schemas/problemTypeTextUnspecific"
+            - $ref: "#/components/schemas/problemTypeTextPisSpecific"
+            - $ref: "#/components/schemas/problemTypeTextAisSpecific"
+            - $ref: "#/components/schemas/problemTypeTextPiisSpecific"     
+            - $ref: "#/components/schemas/problemTypeTextSbSpecific"                       
+
+        title:
+          $ref: "#/components/schemas/title"  
+        detail:
+          $ref: "#/components/schemas/detail"  
+        code:
+          anyOf:
+            - $ref: "#/components/schemas/messageCodeTextUnspecific"
+            - $ref: "#/components/schemas/messageCodeTextPisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextAisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextPiisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextSbSpecific"            
+        additionalErrors:
+          type: array
+          items:
+            $ref: "#/components/schemas/errorInformation"
+        _links:
+            $ref: "#/components/schemas/_links"
+
+    _links:
+      type: array
+      items: 
+        anyOf:       
+          - $ref: "#/components/schemas/_linksPaymentInitiation"
+          - $ref: "#/components/schemas/_linksPaymentInitiationMultiLevelSca"  
+          - $ref: "#/components/schemas/_linksPaymentInitiationCancel"
+          - $ref: "#/components/schemas/_linksUpdatePsuIdentification"                  
+          - $ref: "#/components/schemas/_linksUpdatePsuAuthentication"
+          - $ref: "#/components/schemas/_linksSelectPsuAuthenticationMethod"                      
+          - $ref: "#/components/schemas/_linksStartScaProcess"
+          - $ref: "#/components/schemas/_linksDownload"             
+          - $ref: "#/components/schemas/_linksConsents"             
+          - $ref: "#/components/schemas/_linksSigningBasket"             
+          - $ref: "#/components/schemas/_linksAccountReport"             
+          - $ref: "#/components/schemas/_linksTransactionDetails"             
+          - $ref: "#/components/schemas/_linksAccountDetails"             
+          
+      
+    errorInformation:
+      description: This is a data element to support the declaration of additional errors in the context of [RFC7807](https://tools.ietf.org/html/rfc7807). 
+      properties:
+        title:
+          $ref: "#/components/schemas/title"  
+        detail:
+          $ref: "#/components/schemas/detail"  
+        code:
+          anyOf:
+            - $ref: "#/components/schemas/messageCodeTextUnspecific"
+            - $ref: "#/components/schemas/messageCodeTextPisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextAisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextPiisSpecific"  
+            - $ref: "#/components/schemas/messageCodeTextSbSpecific"             
+   
+    title:
+      description: A URI reference [RFC3986] that identifies the problem type. 
+      type: string
+      maxLength: 70
+    detail:
+      description: A URI reference [RFC3986] that identifies the problem type. 
+      type: string
+      maxLength: 512           
+
+#####################################################
 # Tpp-Messages
 #####################################################
 
@@ -7316,6 +8110,7 @@ components:
             - $ref: "#/components/schemas/messageCodeTextPisSpecific"
             - $ref: "#/components/schemas/messageCodeTextAisSpecific"
             - $ref: "#/components/schemas/messageCodeTextPiisSpecific"
+            - $ref: "#/components/schemas/messageCodeTextSbSpecific"            
         path:
           type: string
         text:
@@ -7341,10 +8136,29 @@ components:
         text:
           $ref: "#/components/schemas/tppMessageText"
 
+    tppMessage_GENERIC-PARAMETER_NOT_CONSISTENT_400:
+      description: |
+        Parameters submitted by TPP are not consistent.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "PARAMETER_NOT_CONSISTENT"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
     tppMessage_GENERIC-PARAMETER_NOT_SUPPORTED_400:
       description: |
         The parameter is not supported by the API provider.
-        This code should only be used for parameters that are described as
+        This code should only be used for parameters that are described as "optional if supported by API provider"
       type: object
       required:
         - category
@@ -7363,7 +8177,8 @@ components:
 
     tppMessage_GENERIC-RESOURCE_UNKNOWN_404_403_400:
       description: |
-        The addressed resource is unknown relative to the TPP.
+        The addressed resource is unknown relative to the TPP. 
+        An example for a payload reference is creating a signing basket with an unknown resource identficiation.
           - 404 (if account-id in path)
           - 403 (if other resource in path)
           - 400 (if payload)
@@ -7403,6 +8218,27 @@ components:
           type: string
         text:
           $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-RESOURCE_BLOCKED_403_400:
+      description: |
+        The addressed resource is not addressable by this request, since it is blocked e.g. by a grouping in a signing basket.
+          - 403 (if path)
+          - 400 (if payload)
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "RESOURCE_BLOCKED"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"          
 
     tppMessage_GENERIC-TIMESTAMP_INVALID_400:
       description: Timestamp not in accepted time period.
@@ -7455,6 +8291,62 @@ components:
           type: string
           enum: 
             - "SCA_METHOD_UNKNOWN"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_GENERIC-STATUS_INVALID_400:
+      description: |
+        Addressed resource does not allow additional authorisation.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "STATUS_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_SB_REFERENCE_MIX_INVALID_400:
+      description: |
+        The used combination of referenced objects is not supported in the ASPSPs signing basket function.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "REFERENCE_MIX_INVALID"
+        path:
+          type: string
+        text:
+          $ref: "#/components/schemas/tppMessageText"
+
+    tppMessage_SB_REFERENCE_STATUS_INVALID_409:
+      description: At least one of the references is already fully authorised.
+      type: object
+      required:
+        - category
+        - code
+      properties:
+        category:
+           $ref: "#/components/schemas/tppMessageCategory"
+        code:
+          type: string
+          enum: 
+            - "REFERENCE_STATUS_INVALID"
         path:
           type: string
         text:
@@ -8022,16 +8914,21 @@ components:
       items:
         anyOf:
           - $ref: "#/components/schemas/tppMessage_GENERIC-FORMAT_ERROR_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-PARAMETER_NOT_CONSISTENT_400"          
           - $ref: "#/components/schemas/tppMessage_GENERIC-PARAMETER_NOT_SUPPORTED_400"
           - $ref: "#/components/schemas/tppMessage_GENERIC-SERVICE_INVALID_400_405"  
           - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_UNKNOWN_404_403_400"
           - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_EXPIRED_403_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_BLOCKED_403_400"          
           - $ref: "#/components/schemas/tppMessage_GENERIC-TIMESTAMP_INVALID_400"
           - $ref: "#/components/schemas/tppMessage_GENERIC-PERIOD_INVALID_400"
           - $ref: "#/components/schemas/tppMessage_GENERIC-SCA_METHOD_UNKNOWN_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-STATUS_INVALID_400"          
           - $ref: "#/components/schemas/tppMessage_GENERIC-CONSENT_UNKNOWN_403_400"
           - $ref: "#/components/schemas/tppMessage_PIIS-CARD_INVALID_400"
           - $ref: "#/components/schemas/tppMessage_PIIS-NO_PIIS_ACTIVATION_400"
+          - $ref: "#/components/schemas/tppMessage_SB_REFERENCE_MIX_INVALID_400" 
+          - $ref: "#/components/schemas/tppMessage_SB_REFERENCE_STATUS_INVALID_409"                       
           - $ref: "#/components/schemas/tppMessage_AIS-SESSIONS_NOT_SUPPORTED_400"
           - $ref: "#/components/schemas/tppMessage_PIS-PAYMENT_FAILED_400"
           - $ref: "#/components/schemas/tppMessage_PIS-EXECUTION_DATE_INVALID_400"
@@ -8086,6 +8983,7 @@ components:
           - $ref: "#/components/schemas/tppMessage_GENERIC-CONSENT_UNKNOWN_403_400"
           - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_UNKNOWN_404_403_400"
           - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_EXPIRED_403_400"
+          - $ref: "#/components/schemas/tppMessage_GENERIC-RESOURCE_BLOCKED_403_400"          
           - $ref: "#/components/schemas/tppMessage_PIS-PRODUCT_INVALID_403"
       example:
         [{
@@ -8137,6 +9035,18 @@ components:
           "text": "additional text information of the ASPSP up to 512 characters"
         }]
 
+    tppMessages409:
+      description: Messages with HTTP error code 409 to the TPP on operational issues.
+      type: array
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/tppMessage_SB_REFERENCE_STATUS_INVALID_409"
+      example:
+        [{
+          "category": "ERROR",
+          "code": "REQUESTED_FORMATS_INVALID",
+          "text": "additional text information of the ASPSP up to 512 characters"
+        }]
 
     tppMessages429: 
       description: Messages with HTTP error code 429 to the TPP on operational issues.
@@ -8968,6 +9878,21 @@ components:
             "Example 3":
               $ref: "#/components/examples/accountListExample3"
 
+    OK_200_CardAccountList:
+      description: OK
+      
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/cardAccountList"
+          examples:
+            "Example 1":
+              $ref: "#/components/examples/cardAccountList"
+
 
     OK_200_CancellationList:
       description: OK
@@ -9002,7 +9927,36 @@ components:
             "Multicurrency Account":
               $ref: "#/components/examples/accountDetailsMulticurrencyAccount"
 
+    OK_200_CardAccountDetails:
+      description: OK
+      
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/cardAccountDetails"
+          examples:
+            "Card Account": 
+              $ref: "#/components/examples/cardAccountDetails"
 
+    OK_200_CardTransactionDetails:
+      description: OK
+      
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/cardTransactionDetails"
+          examples:
+            Example:
+              $ref: "#/components/examples/cardTransactionDetailsExample"
+    
     OK_200_TransactionDetails:
       description: OK
       
@@ -9035,6 +9989,38 @@ components:
               $ref: "#/components/examples/balancesExample1_RegularAccount"
             "Example 2: Multicurrency Account":
               $ref: "#/components/examples/balancesExample2_MulticurrencyAcount"
+
+    OK_200_CardAccountBalances:
+      description: OK
+      
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/readCardAccountBalanceResponse-200"
+          examples:
+            "Card Account":
+              $ref: "#/components/examples/balancesExampleCardAccount"
+
+    OK_200_CardTransactions:
+      description: OK
+      
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/cardTransactionsResponse-200"
+          examples:
+            "Example 1":
+              $ref: "#/components/examples/cardTransactionsExample1"
+            "Example 2":
+              $ref: "#/components/examples/cardTransactionsExample2_Download_json"
 
 
     OK_200_Transactions:
@@ -9325,6 +10311,13 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       #NO RESPONSE BODY
 
+    NO_CONTENT_204_SigningBaskets:
+      description: No Content
+      
+      headers:
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      #NO RESPONSE BODY
 
     #####################################################
     # Negative Responses
@@ -9340,6 +10333,24 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       
       content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }
         application/json:
           schema:
             $ref: "#/components/schemas/tppMessages400" 
@@ -9362,6 +10373,24 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       
       content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }
         application/json:
           schema:
             $ref: "#/components/schemas/tppMessages401" 
@@ -9372,6 +10401,7 @@ components:
             "text": "additional text information of the ASPSP up to 512 characters"
             }]
             }
+  
 
 
     FORBIDDEN_403:
@@ -9384,6 +10414,24 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       
       content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }      
         application/json:
           schema:
             $ref: "#/components/schemas/tppMessages403" 
@@ -9406,6 +10454,24 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       
       content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }      
         application/json:
           schema:
             $ref: "#/components/schemas/tppMessages404" 
@@ -9428,6 +10494,24 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       
       content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }      
         application/json:
           schema:
             $ref: "#/components/schemas/tppMessages405" 
@@ -9450,6 +10534,24 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       
       content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }      
         application/json:
           schema:
             $ref: "#/components/schemas/tppMessages406" 
@@ -9472,6 +10574,44 @@ components:
       #No TPP-Messages defined
       #NO RESPONSE BODY
 
+    CONFLICT_409:
+      description: Conflict
+      
+      headers:
+        Location:
+          $ref: "#/components/headers/Location"
+        X-Request-ID:
+          $ref: "#/components/headers/X-Request-ID"
+      
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }      
+        application/json:
+          schema:
+            $ref: "#/components/schemas/tppMessages409" 
+          example:
+            { "tppMessages": [{
+            "category": "ERROR",
+            "code": "REQUESTED_FORMATS_INVALID",
+            "text": "additional text information of the ASPSP up to 512 characters"
+            }]
+            }
 
     UNSUPPORTED_MEDIA_TYPE_415:
       description: Unsupported Media Type
@@ -9495,6 +10635,24 @@ components:
           $ref: "#/components/headers/X-Request-ID"
       
       content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/problemDetails" 
+          example:
+            {
+              "type": "https://berlingroup.com/error-codes/TOKEN_INVALID",
+              "title": " The OAuth2 token is associated to the TPP but is not valid for the addressed service/resource.",
+              "detail": " additional text information of the ASPSP up to 512 characters",
+              "code": "TOKEN_INVALID",
+              "additionalErrors": [
+                {
+                  "title": "The PSU-Corporate-ID cannot be matched by the addressed ASPSP.",
+                  "detail": "additional text information of the ASPSP up to 512 characters",
+                  "code": "CORPORATE_ID_INVALID"
+                }
+              ],
+              "_links": { }
+            }      
         application/json:
           schema:
             $ref: "#/components/schemas/tppMessages429" 
@@ -9723,7 +10881,60 @@ components:
             }]
         }
 
+    cardAccountList:
+      description: List of card accounts
+      value:
+        cardAccounts:
+          - resourceId: 3d9a81b3-a47d-4130-8765-a9c0ff861b99
+            maskedPan: 525412******3241
+            currency: EUR
+            name: Main
+            product: Basic Credit
+            status: enabled
+            creditLimit:
+              currency: EUR
+              amount: 15000
+            balances:
+              - balanceType: interimBooked
+                balanceAmount:
+                  currency: EUR
+                  amount: 14355.78
+              - balanceType: nonBilled
+                balanceAmount:
+                  currency: EUR
+                  amount: 4175.86
+            _links:
+              transactions:
+                href: /v1/card-accounts/3d9a81b3-a47d-4130-8765- a9c0ff861b99/transactions
 
+
+    cardAccountDetails:
+      description: Account Details for a card account
+      value:
+        cardAccount:
+          resourceId: 3d9a81b3-a47d-4130-8765-a9c0ff861b99
+          maskedPan: 525412******3241
+          currency: EUR
+          name: Main
+          product: Basic Credit
+          status: enabled
+          creditLimit:
+            currency: EUR
+            amount: 15000
+          balances:
+            - balanceType: interimBooked
+              balanceAmount:
+                currency: EUR
+                amount: 14355.78
+            - balanceType: nonBilled
+              balanceAmount:
+                currency: EUR
+                amount: 4175.86
+          _links:
+            transactions:
+              href: /v1/card-accounts/3d9a81b3-a47d-4130-8765- a9c0ff861b99/transactions
+
+        
     accountDetailsRegularAccount:
       description: Account Details for a regular Account
       value:
@@ -10263,6 +11474,22 @@ components:
         }
 
 
+    balancesExampleCardAccount:
+      description: Response for a read balance request in case of a card account.
+      value: 
+        {
+          "cardAccount": {"maskedPan": "525412******3241"},
+          "balances":
+              [{"balanceType": "closingBooked",
+            "balanceAmount": {"currency": "EUR", "amount": "500.00"},
+                "referenceDate": "2017-10-25"
+                   },
+               {"balanceType": "expected", 
+                "balanceAmount": {"currency": "EUR","amount": "900.00"},
+               "lastChangeDateTime": "2017-10-25T15:30:35.035Z"
+               }]
+        }
+        
     balancesExample1_RegularAccount:
       description: Response for a read balance request in case of a regular account.
       value: 
@@ -10306,6 +11533,49 @@ components:
                    }]
         }
 
+    cardTransactionsExample1:
+      description: Response in JSON format for an access on a card account
+      value:
+        cardAccount:
+          maskedPan: 525412******3241
+        transactions:
+          booked:
+            - cardTransactionId: '201710020036959'
+              transactionAmount:
+                currency: EUR
+                amount: '256.67'
+              transactionDate: '2017-10-25'
+              bookingDate: '2017-10-26'
+              originalAmount:
+                currency: SEK
+                amount: '2499'
+              cardAcceptorAddress:
+                city: STOCKHOLM
+                country: SE
+              maskedPan: 525412******3241
+              proprietaryBankTransactionCode: PURCHASE
+              invoiced: false
+              transactionDetails: WIFIMARKET.SE
+            - cardTransactionId: '201710020091863'
+              transactionAmount:
+                currency: EUR
+                amount: '10.72'
+              transactionDate: '2017-10-25'
+              bookingDate: '2017-10-26'
+              originalAmount:
+                currency: SEK
+                amount: '99'
+              cardAcceptorAddress:
+                city: STOCKHOLM
+                country: SE
+              maskedPan: 525412******8999
+              proprietaryBankTransactionCode: PURCHASE
+              invoiced: false
+              transactionDetails: ICA SUPERMARKET SKOGHA
+          pending: []
+          _links:
+            cardAccount:
+              href: /v1/card-accounts/3d9a81b3-a47d-4130-8765-a9c0ff861b99
 
     transactionsExample1_RegularAccount_json:
       description: Response in JSON format for an access on a regular account
@@ -10345,7 +11615,13 @@ components:
              }
         }
 
-
+    cardTransactionsExample2_Download_json:
+      description: Response in case of huge data amount as a download.
+      value:
+        { 
+          "_links": {"download": {"href": "www.test-api.com/xs2a/v1/card-accounts/12345678999/transactions/download/"}}
+        }
+        
     transactionsExample2_Download_json:
       description: Response in case of huge data amount as a download.
       value:
@@ -10398,6 +11674,27 @@ components:
            "_links": {"account": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e80f"}}
            }
         }
+
+    cardTransactionDetailsExample:
+      description: Example for card transaction details
+      value:
+        cardTransactionsDetails:
+          cardTransactionId: '201710020036959'
+          transactionAmount:
+            currency: EUR
+            amount: '256.67'
+          transactionDate: '2017-10-25'
+          bookingDate: '2017-10-26'
+          originalAmount:
+            currency: SEK
+            amount: '2499'
+          cardAcceptorAddress:
+            city: STOCKHOLM
+            country: SE
+          maskedPan: 525412******3241
+          proprietaryBankTransactionCode: PURCHASE
+          invoiced: false
+          transactionDetails: WIFIMARKET.SE
 
 
     transactionDetailsExample:
