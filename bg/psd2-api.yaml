@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: BG PSD2 API
-  version: "1.3 Dec 20th 2018"
+  title: NextGenPSD2 XS2A Framework
+  version: "1.3.2 Feb 18th 2019"
   description: |
     # Summary
     The **NextGenPSD2** *Framework Version 1.3* offers a modern, open, harmonised and interoperable set of 
@@ -186,6 +186,7 @@ paths:
         - $ref: "#/components/parameters/TPP-Redirect-URI"
         - $ref: "#/components/parameters/TPP-Nok-Redirect-URI"
         - $ref: "#/components/parameters/TPP-Explicit-Authorisation-Preferred"
+        - $ref: "#/components/parameters/TPP-Rejection-NoFunds-Preferred"
           #optional additional PSU Information in header
         - $ref: "#/components/parameters/PSU-IP-Port"
         - $ref: "#/components/parameters/PSU-Accept"
@@ -218,6 +219,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -293,6 +296,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -384,6 +389,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -462,6 +469,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -493,15 +502,16 @@ paths:
         
         This applies in the following scenarios:
         
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding Payment 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding Payment 
             Initiation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be 
             uploaded by using the extended forms.
             * 'startAuthorisationWithPsuIdentfication', 
-            * 'startAuthorisationWithPsuAuthentication' #TODO
+            * 'startAuthorisationWithPsuAuthentication' 
+            * 'startAuthorisationWithEncryptedPsuAuthentication'
             * 'startAuthorisationWithAuthentciationMethodSelection' 
           * The related payment initiation cannot yet be executed since a multilevel SCA is mandated.
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding 
             Payment Cancellation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be uploaded 
             by using the extended forms as indicated above.
@@ -540,6 +550,9 @@ paths:
         - $ref: "#/components/parameters/PSU-ID-Type"
         - $ref: "#/components/parameters/PSU-Corporate-ID"
         - $ref: "#/components/parameters/PSU-Corporate-ID-Type"
+        - $ref: "#/components/parameters/TPP-Redirect-Preferred"
+        - $ref: "#/components/parameters/TPP-Redirect-URI"
+        - $ref: "#/components/parameters/TPP-Nok-Redirect-URI"
           #header to support the signature function
         - $ref: "#/components/parameters/Digest"
         - $ref: "#/components/parameters/Signature"
@@ -555,7 +568,16 @@ paths:
         - $ref: "#/components/parameters/PSU-Http-Method"
         - $ref: "#/components/parameters/PSU-Device-ID"
         - $ref: "#/components/parameters/PSU-Geo-Location"
-      #NO REQUEST BODY 
+
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              oneOf: #Different Authorisation Bodies
+                - {}  
+                - $ref: "#/components/schemas/updatePsuAuthentication"
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod"
+                - $ref: "#/components/schemas/transactionAuthorisation" 
       
       responses:
         '201':
@@ -575,6 +597,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -655,6 +679,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -736,6 +762,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -841,11 +869,11 @@ paths:
         content: 
           application/json:
             schema:
-              oneOf:
-                - {} #Update PSU Identification 
-                - $ref: "#/components/schemas/updatePsuAuthentication" #Update PSU Authentication
-                - $ref: "#/components/schemas/selectPsuAuthenticationMethod" #Select PSU Authentication Method
-                - $ref: "#/components/schemas/transactionAuthorisation" #Transaction Authorisation
+              oneOf: #Different Authorisation Bodies
+                - {}  
+                - $ref: "#/components/schemas/updatePsuAuthentication"
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod"
+                - $ref: "#/components/schemas/transactionAuthorisation" 
             examples:
               "Update PSU Identification (Decoupled Approach)":
                 value: {}
@@ -874,6 +902,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -906,15 +936,15 @@ paths:
         
         This applies in the following scenarios:
         
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding Payment 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding Payment 
             Initiation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be 
             uploaded by using the extended forms.
             * 'startAuthorisationWithPsuIdentfication', 
-            * 'startAuthorisationWithPsuAuthentication' #TODO
+            * 'startAuthorisationWithPsuAuthentication' 
             * 'startAuthorisationWithAuthentciationMethodSelection' 
           * The related payment initiation cannot yet be executed since a multilevel SCA is mandated.
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding 
             Payment Cancellation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be uploaded 
             by using the extended forms as indicated above.
@@ -957,6 +987,9 @@ paths:
         - $ref: "#/components/parameters/PSU-ID-Type"
         - $ref: "#/components/parameters/PSU-Corporate-ID"
         - $ref: "#/components/parameters/PSU-Corporate-ID-Type"
+        - $ref: "#/components/parameters/TPP-Redirect-Preferred"
+        - $ref: "#/components/parameters/TPP-Redirect-URI"
+        - $ref: "#/components/parameters/TPP-Nok-Redirect-URI"
           #optional additional PSU Information in header
         - $ref: "#/components/parameters/PSU-IP-Address_optional"
         - $ref: "#/components/parameters/PSU-IP-Port"
@@ -988,6 +1021,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -1065,6 +1100,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -1146,6 +1183,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -1253,11 +1292,11 @@ paths:
         content: 
           application/json:
             schema:
-              oneOf: 
-                - {} #Update PSU Identification
-                - $ref: "#/components/schemas/updatePsuAuthentication" #Update PSU Authentication
-                - $ref: "#/components/schemas/selectPsuAuthenticationMethod" #Select PSU Authentication Method
-                - $ref: "#/components/schemas/transactionAuthorisation" #Transaction Authorisation
+              oneOf: #Different Authorisation Bodies
+                - {}  
+                - $ref: "#/components/schemas/updatePsuAuthentication"
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod"
+                - $ref: "#/components/schemas/transactionAuthorisation" 
             examples:
               "Update PSU Identification (Embedded Approach)":
                 value: {}
@@ -1286,6 +1325,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIS"
         '429':
@@ -1389,6 +1430,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -1479,6 +1522,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -1564,6 +1609,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -1573,7 +1620,7 @@ paths:
         '503':
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_AIS"
 
-  /v1/accounts/{account-id}/transactions/:
+  /v1/accounts/{account-id}/transactions:
     get:
       summary: Read transaction list of an account
       description: |
@@ -1653,6 +1700,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -1737,6 +1786,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -1751,7 +1802,7 @@ paths:
       # Card Accounts
       #####################################################
 
-  /card-accounts:
+  /v1/card-accounts:
 
     get:
       summary: Reads a list of card accounts
@@ -1823,6 +1874,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -1832,7 +1885,7 @@ paths:
         '503':
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_AIS"
       
-  /card-accounts/{account-id}:
+  /v1/card-accounts/{account-id}:
     get:
       summary: Reads details about a card account
       description: |
@@ -1905,6 +1958,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -1915,7 +1970,7 @@ paths:
           $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_AIS"
 
 
-  /card-accounts/{account-id}/balances:
+  /v1/card-accounts/{account-id}/balances:
     get:
       summary: Read card account balances
       description: |
@@ -1992,6 +2047,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2003,7 +2060,7 @@ paths:
 
 
 
-  /card-accounts/{account-id}/transactions:
+  /v1/card-accounts/{account-id}/transactions:
     get:
       summary: Read transaction list of an account
       description: |
@@ -2079,6 +2136,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2187,6 +2246,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2267,6 +2328,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2342,6 +2405,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2418,6 +2483,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2449,15 +2516,16 @@ paths:
         
         This applies in the following scenarios:
         
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding Payment 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding Payment 
             Initiation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be 
             uploaded by using the extended forms.
             * 'startAuthorisationWithPsuIdentfication', 
-            * 'startAuthorisationWithPsuAuthentication' #TODO
+            * 'startAuthorisationWithPsuAuthentication' 
+            * 'startAuthorisationWithEncryptedPsuAuthentication'
             * 'startAuthorisationWithAuthentciationMethodSelection' 
           * The related payment initiation cannot yet be executed since a multilevel SCA is mandated.
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding 
             Payment Cancellation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be uploaded 
             by using the extended forms as indicated above.
@@ -2498,6 +2566,9 @@ paths:
         - $ref: "#/components/parameters/PSU-ID-Type"
         - $ref: "#/components/parameters/PSU-Corporate-ID"
         - $ref: "#/components/parameters/PSU-Corporate-ID-Type"
+        - $ref: "#/components/parameters/TPP-Redirect-Preferred"
+        - $ref: "#/components/parameters/TPP-Redirect-URI"
+        - $ref: "#/components/parameters/TPP-Nok-Redirect-URI"
           #conditional elemention for AIS
         - $ref: "#/components/parameters/PSU-IP-Address_conditionalForAis"
           #optional additional PSU Information in header
@@ -2510,7 +2581,16 @@ paths:
         - $ref: "#/components/parameters/PSU-Http-Method"
         - $ref: "#/components/parameters/PSU-Device-ID"
         - $ref: "#/components/parameters/PSU-Geo-Location"
-      #NO REQUEST BODY
+
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              oneOf: #Different Authorisation Bodies
+                - {}  
+                - $ref: "#/components/schemas/updatePsuAuthentication"
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod"
+                - $ref: "#/components/schemas/transactionAuthorisation" 
       
       responses:
         '201':
@@ -2530,6 +2610,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2608,6 +2690,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2688,6 +2772,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2795,11 +2881,11 @@ paths:
         content: 
           application/json:
             schema:
-              oneOf:
-                - {} #Update PSU Identification 
-                - $ref: "#/components/schemas/updatePsuAuthentication" #Update PSU Authentication
-                - $ref: "#/components/schemas/selectPsuAuthenticationMethod" #Select PSU Authentication Method
-                - $ref: "#/components/schemas/transactionAuthorisation" #Transaction Authorisation
+              oneOf: #Different Authorisation Bodies
+                - {}  
+                - $ref: "#/components/schemas/updatePsuAuthentication"
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod"
+                - $ref: "#/components/schemas/transactionAuthorisation" 
             examples:
               "Update PSU Identification/Additional SCA Process (Embedded Approach)":
                 value: {}
@@ -2828,6 +2914,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_AIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_AIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_AIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_AIS"
         '429':
@@ -2860,6 +2948,8 @@ paths:
       #header
           #common header parameter
         - $ref: "#/components/parameters/X-Request-ID"
+          #method specific header elements
+        - $ref: "#/components/parameters/consentId_HEADER_optional"  
           #header to support the signature function
         - $ref: "#/components/parameters/Digest"
         - $ref: "#/components/parameters/Signature"
@@ -2886,6 +2976,8 @@ paths:
           $ref: "#/components/responses/NOT_ACCEPTABLE_406_PIIS"
         '408':
           $ref: "#/components/responses/REQUEST_TIMEOUT_408_PIIS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_PIIS"
         '415':
           $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_PIIS"
         '429':
@@ -2909,7 +3001,7 @@ paths:
         The resource identifications of these transactions are contained in the  payload of this access method
       operationId: createSigningBasket
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
         
       security:
       ##################################################### 
@@ -2966,27 +3058,29 @@ paths:
           $ref: "#/components/responses/CREATED_201_SigningBasket"
         
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
 
   /v1/signing-baskets/{basketId}:
@@ -2997,7 +3091,7 @@ paths:
         Returns the content of an signing basket object. 
       operationId: getSigningBasket
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
       security:
       ##################################################### 
       # REMARKS ON SECURITY IN THIS OPENAPI FILE
@@ -3041,27 +3135,29 @@ paths:
           $ref: "#/components/responses/OK_200_GetSigningBasket"
         
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
     delete:
       summary: Delete the signing basket
@@ -3073,7 +3169,7 @@ paths:
         Nevertheless, single transactions might be cancelled on an individual basis on the XS2A interface.
       operationId: deleteSigningBasket
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
         - Common Services
       security:
       ##################################################### 
@@ -3118,27 +3214,29 @@ paths:
           $ref: "#/components/responses/NO_CONTENT_204_SigningBasket"
         
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
 
   /v1/signing-baskets/{basketId}/status:
@@ -3149,7 +3247,7 @@ paths:
         Returns the status of a signing basket object. 
       operationId: getSigningBasketStatus
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
         - Common Services
       security:
       ##################################################### 
@@ -3199,28 +3297,29 @@ paths:
           $ref: "#/components/responses/OK_200_SigningBasketStatus"
         
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
-
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
 
   /v1/signing-baskets/{basketId}/authorisations:
@@ -3245,15 +3344,16 @@ paths:
         
         This applies in the following scenarios:
         
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding Payment 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding Payment 
             Initiation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be 
             uploaded by using the extended forms.
             * 'startAuthorisationWithPsuIdentfication', 
-            * 'startAuthorisationWithPsuAuthentication' #TODO
+            * 'startAuthorisationWithPsuAuthentication' 
+            * 'startAuthorisationWithEncryptedPsuAuthentication'
             * 'startAuthorisationWithAuthentciationMethodSelection' 
           * The related payment initiation cannot yet be executed since a multilevel SCA is mandated.
-          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceeding 
+          * The ASPSP has indicated with an 'startAuthorisation' hyperlink in the preceding 
             Payment Cancellation Response that an explicit start of the authorisation process is needed by the TPP. 
             The 'startAuthorisation' hyperlink can transport more information about data which needs to be uploaded 
             by using the extended forms as indicated above.
@@ -3262,7 +3362,7 @@ paths:
           * The signing basket needs to be authorised yet.
       operationId: startSigningBasketAuthorisation
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
         - Common Services
       security:
       ##################################################### 
@@ -3294,6 +3394,9 @@ paths:
         - $ref: "#/components/parameters/PSU-ID-Type"
         - $ref: "#/components/parameters/PSU-Corporate-ID"
         - $ref: "#/components/parameters/PSU-Corporate-ID-Type"
+        - $ref: "#/components/parameters/TPP-Redirect-Preferred"
+        - $ref: "#/components/parameters/TPP-Redirect-URI"
+        - $ref: "#/components/parameters/TPP-Nok-Redirect-URI"
           #optional additional PSU Information in header
         - $ref: "#/components/parameters/PSU-IP-Address_optional"
         - $ref: "#/components/parameters/PSU-IP-Port"
@@ -3305,34 +3408,45 @@ paths:
         - $ref: "#/components/parameters/PSU-Http-Method"
         - $ref: "#/components/parameters/PSU-Device-ID"
         - $ref: "#/components/parameters/PSU-Geo-Location"
-      #NO REQUEST BODY
+
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              oneOf: #Different Authorisation Bodies
+                - {}  
+                - $ref: "#/components/schemas/updatePsuAuthentication"
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod"
+                - $ref: "#/components/schemas/transactionAuthorisation" 
       
       responses:
         '201':
           $ref: "#/components/responses/CREATED_201_StartScaProcess"
         
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
 
     get:
@@ -3343,7 +3457,7 @@ paths:
         This function returns an array of hyperlinks to all generated authorisation sub-resources.
       operationId: getSigningBasketAuthorisation
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
         - Common Services
       
       security:
@@ -3390,27 +3504,29 @@ paths:
           $ref: "#/components/responses/OK_200_Authorisations"
         
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
 
   /v1/signing-baskets/{basketId}/authorisations/{authorisationId}:
@@ -3460,7 +3576,7 @@ paths:
             Maybe in a later version the access path will change.
       operationId: updateSigningBasketPsuData
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
         - Common Services
       
       security:
@@ -3511,11 +3627,12 @@ paths:
         content: 
           application/json:
             schema:
-              oneOf:
-                - {} #Update PSU Identification 
-                - $ref: "#/components/schemas/updatePsuAuthentication" #Update PSU Authentication
-                - $ref: "#/components/schemas/selectPsuAuthenticationMethod" #Select PSU Authentication Method
-                - $ref: "#/components/schemas/transactionAuthorisation" #Transaction Authorisation
+              oneOf: #Different Authorisation Bodies
+                - {}  
+                - $ref: "#/components/schemas/updatePsuAuthentication"
+                - $ref: "#/components/schemas/selectPsuAuthenticationMethod"
+                - $ref: "#/components/schemas/transactionAuthorisation" 
+ 
             examples:
               "Update PSU Identification (Embedded Approach)":
                 value: {}
@@ -3531,27 +3648,29 @@ paths:
           $ref: "#/components/responses/OK_200_UpdatePsuData"
           
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
 
     get:
@@ -3560,7 +3679,7 @@ paths:
         This method returns the SCA status of a signing basket's authorisation sub-resource.
       operationId: getSigningBasketScaStatus
       tags:
-        - Signing Baskets
+        - Signing Baskets (SBS)
         - Common Services
       
       security:
@@ -3608,27 +3727,29 @@ paths:
           $ref: "#/components/responses/OK_200_ScaStatus"
         
         '400':
-          $ref: "#/components/responses/BAD_REQUEST_400_SB"
+          $ref: "#/components/responses/BAD_REQUEST_400_SBS"
         '401':
-          $ref: "#/components/responses/UNAUTHORIZED_401_SB"
+          $ref: "#/components/responses/UNAUTHORIZED_401_SBS"
         '403':
-          $ref: "#/components/responses/FORBIDDEN_403_SB"
+          $ref: "#/components/responses/FORBIDDEN_403_SBS"
         '404':
-          $ref: "#/components/responses/NOT_FOUND_404_SB"
+          $ref: "#/components/responses/NOT_FOUND_404_SBS"
         '405':
-          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SB"
+          $ref: "#/components/responses/METHOD_NOT_ALLOWED_405_SBS"
         '406':
-          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SB"
+          $ref: "#/components/responses/NOT_ACCEPTABLE_406_SBS"
         '408':
-          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SB"
+          $ref: "#/components/responses/REQUEST_TIMEOUT_408_SBS"
+        '409':
+          $ref: "#/components/responses/CONFLICT_409_SBS"
         '415':
-          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SB"
+          $ref: "#/components/responses/UNSUPPORTED_MEDIA_TYPE_415_SBS"
         '429':
-          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SB"
+          $ref: "#/components/responses/TOO_MANY_REQUESTS_429_SBS"
         '500':
-          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SB"
+          $ref: "#/components/responses/INTERNAL_SERVER_ERROR_500_SBS"
         '503':
-          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SB"
+          $ref: "#/components/responses/SERVICE_UNAVAILABLE_503_SBS"
 
 
 components:
@@ -3785,14 +3906,17 @@ components:
           Payment initiation or individual transaction included in the payment initiation has been rejected.
         - 'CANC': 'Cancelled'
           Payment initiation has been cancelled before execution
-          Remark: This code is still requested from ISO20022.
+          Remark: This codeis accepted as new code by ISO20022.
         - 'ACFC': 'AcceptedFundsChecked' -
-          Preceeding check of technical validation and customer profile was successful and an automatic funds check was positive .
-          Remark: This code is still requested from ISO20022.
+          Preceding check of technical validation and customer profile was successful and an automatic funds check was positive .
+          Remark: This code is accepted as new code by ISO20022.
         - 'PATC': 'PartiallyAcceptedTechnical'
           Correct The payment initiation needs multiple authentications, where some but not yet all have been performed. Syntactical and semantical validations are successful.
-          Remark: This code is still requested from ISO20022.
-        
+          Remark: This code is accepted as new code by ISO20022.
+        - 'PART': 'PartiallyAccepted' -
+          A number of transactions have been accepted, whereas another number of transactions have not yet achieved 'accepted' status.
+          Remark: This code may be used only in case of bulk payments. It is only used in a situation where all mandated authorisations have been applied, but some payments have been rejected.
+          
       type: string
       enum:
         - "ACCC"
@@ -3808,10 +3932,11 @@ components:
         - "CANC"
         - "ACFC"
         - "PATC"
+        - "PART"
       example: "ACCP"
 
 
-    transactionStatus_SB:
+    transactionStatus_SBS:
       description: | 
         The transaction status is filled with codes of the ISO 20022 data table.
         Only the codes RCVD, PATC, ACTC, ACWC and RJCT are used:
@@ -4068,9 +4193,15 @@ components:
 
     hrefType:
       description: Link to a resource
+      type: object
+      properties:
+        href:
+          $ref: "#/components/schemas/hrefEntry"
+
+    hrefEntry:
+      description: Link to a resource
       type: string
       example: "/v1/payments/sepa-credit-transfers/1234-wertiq-983"
-
 
 
 
@@ -4227,6 +4358,7 @@ components:
           - "authorised"
           - "openingBooked"
           - "interimAvailable"
+          - "interimBooked"
           - "forwardAvailable"
           - "nonInvoiced"
 
@@ -4538,8 +4670,8 @@ components:
           format: date
         transactionAmount:
           $ref: "#/components/schemas/amount"
-        exchangeRate:
-          $ref: "#/components/schemas/exchangeRateList"
+        currencyExchange:
+          $ref: "#/components/schemas/reportExchangeRateList"
         creditorName:
           $ref: "#/components/schemas/creditorName"
         creditorAccount:
@@ -4553,8 +4685,7 @@ components:
         ultimateDebtor:
           $ref: "#/components/schemas/ultimateDebtor"
         remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
+          $ref: "#/components/schemas/remittanceInformationUnstructured"
         remittanceInformationStructured:
           description: |
             Reference as contained in the structured remittance reference structure (without the surrounding XML structure).
@@ -4562,6 +4693,11 @@ components:
             Different from other places the content is containt in plain form not in form of a structered field.
           type: string
           maxLength: 140
+        additionalInformation:
+          description: |
+            Might be used by the ASPSP to transport additional transaction related information to the PSU.
+          type: string
+          maxLength: 512
         purposeCode:
           $ref: "#/components/schemas/purposeCode"
         bankTransactionCode:
@@ -4588,8 +4724,8 @@ components:
           $ref: "#/components/schemas/bookingDate"
         transactionAmount:
           $ref: "#/components/schemas/amount"
-        exchangeRate:
-          $ref: "#/components/schemas/exchangeRateList"
+        currencyExchange:
+          $ref: "#/components/schemas/reportExchangeRateList"
         originalAmount:
           $ref: "#/components/schemas/amount"
         markupFee:
@@ -4597,14 +4733,15 @@ components:
         markupFeePercentage:
           #description: Percentage of the involved transaction fee in relation to the billing amount.
           type: string
+          example: "0.3"
         cardAcceptorId:
           #description: Identification of the Card Acceptor (e.g. merchant) as given in the related card transaction.
           type: string
           maxLength: 35
         cardAcceptorAddress:
           $ref: "#/components/schemas/address" 
-        cardAcceptorCategoryCode:
-          $ref: "#/components/schemas/cardAcceptorCategoryCode" 
+        merchantCategoryCode:
+          $ref: "#/components/schemas/merchantCategoryCode" 
         maskedPAN:
           $ref: "#/components/schemas/maskedPan"
         transactionDetails:
@@ -4615,36 +4752,54 @@ components:
         proprietaryBankTransactionCode:
           $ref: "#/components/schemas/proprietaryBankTransactionCode"
 
-    exchangeRateList:
+    reportExchangeRateList:
       description: Array of exchange rates
       type: array
       items: 
-        $ref: "#/components/schemas/exchangeRate"
+        $ref: "#/components/schemas/reportExchangeRate"
 
 
-    exchangeRate:
+    reportExchangeRate:
       description: Exchange Rate
       type: object
       required:
         - sourceCurrency
-        - rate
+        - exchangeRate
         - unitCurrency
         - targetCurrency
-        - rateDate
+        - quotationDate
       properties:
         sourceCurrency:
           $ref: "#/components/schemas/currencyCode"
-        rate:
+        exchangeRate:
           type: string
         unitCurrency:
           type: string
         targetCurrency:
           $ref: "#/components/schemas/currencyCode"
-        rateDate:
+        quotationDate:
           type: string
           format: date
-        rateContract:
+        contractIdentification:
           type: string
+
+
+    paymentExchangeRate:  
+      description: Exchange Rate
+      type: object
+      properties:
+        unitCurrency:
+          type: string
+        exchangeRate:
+          type: string
+        contractIdentification:
+          type: string
+        rateType:
+          type: string
+          enum:
+            - "SPOT"
+            - "SALE"
+            - "AGRD"
 
 
     balance:
@@ -4786,6 +4941,12 @@ components:
       example: "SE"
 
 
+    creditorNameAndAddress:
+      description: Creditor Name and Address in a free text field
+      type: string
+      maxLength: 140
+      example: "Max Masters, Main Street 1, 12345 City, Example Country"
+
     amount:
       type: object
       required:
@@ -4829,6 +4990,15 @@ components:
       example: "5877.78"
 
 
+    chargeBearer:
+      description: Charge Bearer. ChargeBearerType1Code from ISO20022
+      type: string
+      enum:
+        - "DEBT"
+        - "CRED"
+        - "SHAR"
+        - "SLEV"
+
     remittanceInformationStructured: 
       description: |
         Structured remittance information
@@ -4853,6 +5023,15 @@ components:
       type: string
       maxLength: 140
       example: "Ref Number Merchant"
+
+    remittanceInformationUnstructuredArray:
+      description: |
+        Array of unstructured remittance information
+      type: array
+      items:
+        $ref: "#/components/schemas/remittanceInformationUnstructured"
+      example: ["Ref Number Merchant", "Some Other Text"]
+
 
 
     #####################################################
@@ -5155,11 +5334,6 @@ components:
         - "WTER"
 
 
-    cardAcceptorCategoryCode:
-      description: |
-        Card Acceptor Category Code of the Card Acceptor as given in the related card transaction. 
-      type: string #TODO Type in IG not defined probably identical to merchant category code.
-
     bankTransactionCode: 
       description: |
         Bank transaction code as used by the ASPSP and using the sub elements of this structured code defined by ISO 20022. 
@@ -5179,6 +5353,14 @@ components:
         for MT94x based transaction reports.
       type: string
       maxLength: 35
+
+    merchantCategoryCode:
+      description: Merchant category code
+      type: string
+      maxLength: 4
+      minLength: 4
+ 
+      
 
 
     frequencyCode:
@@ -5208,8 +5390,12 @@ components:
       description: |
         This field indicates the requested maximum frequency for an access without PSU involvement per day.
         For a one-off access, this attribute is set to "1".
+        
+        The frequency needs to be greater equal to one.
       type: integer
       example: 4
+      minimum: 1
+      exclusiveMinimum: false
 
 
     dayOfExecution:
@@ -5258,15 +5444,15 @@ components:
 
     executionRule:
       description: |
-        "following" or "preceeding" supported as values. 
-        This data attribute defines the behavior when recurring payment dates falls on a weekend or bank holiday. 
-        The payment is then executed either the "preceeding" or "following" working day.
+        "following" or "preceding" supported as values. 
+        This data attribute defines the behaviour when recurring payment dates falls on a weekend or bank holiday. 
+        The payment is then executed either the "preceding" or "following" working day.
         ASPSP might reject the request due to the communicated value, if rules in Online-Banking are not supporting 
         this execution rule.
       type: string
       enum:
         - "following"
-        - "preceeding"
+        - "preceding"
 
     psuData:
       description: PSU Data for Update PSU Authentication.
@@ -5289,6 +5475,12 @@ components:
       maxLength: 70
       example: "Creditor Name"
 
+    creditorAgentName:
+      description: Creditor Agent Name
+      type: string
+      maxLength: 70
+      example: "Creditor Agent Name"
+
     debtorName:
       description: Debtor Name
       type: string
@@ -5300,6 +5492,12 @@ components:
       type: string
       maxLength: 70
       example: "Ultimate Debtor"
+
+    debtorId:
+      description: Debtor Id
+      type: string
+      maxLength: 35
+      example: "Debtor Id 1234"
 
     ultimateCreditor:
       description: Ultimate Creditor
@@ -5368,9 +5566,68 @@ components:
     # Content of Request Bodies - JSON
     #####################################################
 
-    paymentInitiationSct_json:
+    paymentInitiation_json: 
       description: |
-        Body for a SCT payment initation.
+        Generic Body for a payment initation via JSON.
+        
+        This generic JSON body can be used to represent valid payment initiations for the following JSON based payment product, 
+        which where defined in the Implementation Guidelines:
+        
+          * sepa-credit-transfers
+          * instant-sepa-credit-transfers
+          * target-2-payments
+          * cross-border-credit-transfers
+        
+        For the convenience of the implementer additional which are already predefinded in the Implementation Guidelines 
+        are included (but commented in source code), such that an ASPSP may add them easily.
+        
+        Take care: Since the format is intended to fit for all payment products 
+        there are additional conditions which are NOT covered by this specification.
+        Please check the Implementation Guidelines for detailes.
+
+        
+        The following data element are depending on the actual payment product available (in source code):
+                  
+         <table style="width:100%">
+         <tr><th>Data Element</th><th>SCT EU Core</th><th>SCT INST EU Core</th><th>Target2 Paym. Core</th><th>Cross Border CT Core</th></tr>
+         <tr><td>endToEndIdentification</td><td> optional</td> <td>optional</td> <td>optional</td> <td>n.a.</td> </tr>
+         <tr><td>debtorAccount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>debtorId</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>ultimateDebtor</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>instructedAmount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>transactionCurrency</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>exchangeRateInformation</td> <td>n.a.</td> <td>n.a.</td><td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorAccount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>creditorAgent</td> <td>optional</td> <td>optional</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>creditorAgentName</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorName</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>creditorId</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorAddress</td>optional</td> <td>optional</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>creditorNameAndAddress</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>ultimateCreditor</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>purposeCode</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>chargeBearer</td> <td>n.a.</td> <td>n.a.</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>remittanceInformationUnstructured</td> <td>optional</td> <td>optional</td> <td> optional</td> <td>optional</td> </tr>
+         <tr><td>remittanceInformationUnstructuredArray</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>remittanceInformationStructured</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>requestedExecutionDate</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>requestedExecutionTime</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+            </td></tr>
+          </table>
+          
+        IMPORTANT: In this API definition the following holds:
+          *  All data elements mentioned above are defined, but some of them are commented, 
+            i.e. they are only visible in the source code and can be used by uncommenting them.
+          * Data elements which are mandatory in the table above for all payment products 
+            are set to be mandatory in this specification.
+          * Data elements which are indicated in the table above as n.a. for all payment products are commented in the source code.
+          * Data elements which are indicated to be option, conditional or mandatory for at least one payment product 
+            in the table above are set to be optional in the s specification except the case where all are definde to be mandatory. 
+          * Data element which are inticated to be n.a. can be used by the ASPS if needed. 
+            In this case uncomment tthe the relatetd lines in the source code.
+          * If one uses this data types for some payment products he has to ensure that the used data type is 
+            valid according to the underlying payment product, e.g. by some appropriate validations.
+
       type: object
       required:
         - debtorAccount
@@ -5383,166 +5640,114 @@ components:
           maxLength: 35
         debtorAccount: 
           $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
+#        debtorId: # N.A. for all, but can be used by ASPSP if needed
+#          $ref: "#/components/schemas/ultimateDebtor"
+#        ultimateDebtor: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/ultimateDebtor"
         instructedAmount:
           $ref: "#/components/schemas/amount"
+#        transactionCurrency: # N.A. for all, but can be used by ASPSP if needed
+#          $ref: "#/components/schemas/currencyCode"
+#        exchangeRateInformation: # N.A. for all, but can be used by ASPSP if needed
+#          $ref: "#/components/schemas/paymentExchangeRate"
         creditorAccount: 
           $ref: "#/components/schemas/accountReference"
         creditorAgent:
           $ref: "#/components/schemas/bicfi"
+        creditorAgentName:
+          $ref: "#/components/schemas/creditorAgentName"
         creditorName:
           $ref: "#/components/schemas/creditorName"
         creditorAddress:
           $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
+#        creditorNameAndAddress: # N.A. for all, but can be used by ASPSP if needed
+#          $ref: "#/components/schemas/creditorNameAndAddress"
+#        ultimateCreditor: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
+#        purposeCode: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/purposeCode"
+#        chargeBearer: #In some payment product N.A. in some Optional in some conditional
+#          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured:
           $ref: "#/components/schemas/remittanceInformationUnstructured"
-#        remittanceInformationStructured: # N.A.
+#        remittanceInformationUnstructuredArray:
+#          $ref: "#/components/schemas/remittanceInformationUnstructuredArray"
+#        remittanceInformationStructured: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate:
+#        requestedExecutionDate: # N.A. for all, but can be used by ASPSP if needed
 #          type: string
 #          format: date
-#        requestedExecutionTime:
-#          type: string
-#          format: date-time
-
-    paymentInitiationSctInst_json:
-      description: |
-        Body for a SCT INST payment initation.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-
-    paymentInitiationTarget2_json:
-      description: |
-        Body for a TARGET-2 payment initation.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-
-    paymentInitiationCrossBorder_json:
-      description: |
-        JSON body for a cross-border payment initation.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-#        endToEndIdentification: # N.A.
-#          type: string
-#          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount:
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode:  # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
+#        requestedExecutionTime: # N.A. for all, but can be used by ASPSP if needed
 #          type: string
 #          format: date-time
 
 
-    paymentInitiationSctBulkElement_json:
+    paymentInitiationBulkElement_json:
       description: |
-        Body for a bulk SCT payment initation.
+        Generic body for a bulk payment initation entry.
+        
+        The bulk entry type is a type which follows the JSON formats for the supported products for single payments
+        excluding the data elements (if supported):
+          * debtorAccount
+          * requestedExecutionDate,
+          * requestedExecutionTime.
+        These data elements may not be contained in any bulk entry.
+
+        This data object can be used to represent valid bulk payment initiations entry for the following JSON based payment product, 
+        which where defined in the Implementation Guidelines:
+        
+          * sepa-credit-transfers
+          * instant-sepa-credit-transfers
+          * target-2-payments
+          * cross-border-credit-transfers
+        
+        For the convenience of the implementer additional which are already predefinded in the Implementation Guidelines 
+        are included (but commented in source code), such that an ASPSP may add them easily.
+        
+        Take care: Since the format is intended to fit for all payment products 
+        there are additional conditions which are NOT covered by this specification.
+        Please check the Implementation Guidelines for detailes.
+
+        
+        The following data element are depending on the actual payment product available (in source code):
+                  
+         <table style="width:100%">
+         <tr><th>Data Element</th><th>SCT EU Core</th><th>SCT INST EU Core</th><th>Target2 Paym. Core</th><th>Cross Border CT Core</th></tr>
+         <tr><td>endToEndIdentification</td><td> optional</td> <td>optional</td> <td>optional</td> <td>n.a.</td> </tr>
+         <tr><td>debtorId</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>ultimateDebtor</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>instructedAmount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>transactionCurrency</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>exchangeRateInformation</td> <td>n.a.</td> <td>n.a.</td><td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorAccount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>creditorAgent</td> <td>optional</td> <td>optional</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>creditorAgentName</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorName</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>creditorId</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorAddress</td>optional</td> <td>optional</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>creditorNameAndAddress</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>ultimateCreditor</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>purposeCode</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>chargeBearer</td> <td>n.a.</td> <td>n.a.</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>remittanceInformationUnstructured</td> <td>optional</td> <td>optional</td> <td> optional</td> <td>optional</td> </tr>
+         <tr><td>remittanceInformationUnstructuredArray</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>remittanceInformationStructured</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+            </td></tr>
+          </table>
+          
+        IMPORTANT: In this API definition the following holds:
+          *  All data elements mentioned above are defined, but some of them are commented, 
+            i.e. they are only visible in the source code and can be used by uncommenting them.
+          * Data elements which are mandatory in the table above for all payment products 
+            are set to be mandatory in this specification.
+          * Data elements which are indicated in the table above as n.a. for all payment products are commented in the source code.
+          * Data elements which are indicated to be option, conditional or mandatory for at least one payment product 
+            in the table above are set to be optional in the s specification except the case where all are definde to be mandatory. 
+          * Data element which are inticated to be n.a. can be used by the ASPS if needed. 
+            In this case uncomment tthe the relatetd lines in the source code.
+          * If one uses this data types for some payment products he has to ensure that the used data type is 
+            valid according to the underlying payment product, e.g. by some appropriate validations.
+
       type: object
       required:
         - instructedAmount
@@ -5552,133 +5757,107 @@ components:
         endToEndIdentification:
           type: string
           maxLength: 35
-#        ultimateDebtor: # N.A.
+#        ultimateDebtor: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/ultimateDebtor"
         instructedAmount:
           $ref: "#/components/schemas/amount"
+#        transactionCurrency: # N.A. for all, but can be used by ASPSP if needed
+#          $ref: "#/components/schemas/currencyCode"
+#        exchangeRateInformation: # N.A. for all, but can be used by ASPSP if needed
+#          $ref: "#/components/schemas/paymentExchangeRate"
         creditorAccount: 
           $ref: "#/components/schemas/accountReference"
         creditorAgent:
           $ref: "#/components/schemas/bicfi"
+        creditorAgentName:
+          $ref: "#/components/schemas/creditorAgentName"
         creditorName:
           $ref: "#/components/schemas/creditorName"
         creditorAddress:
           $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
+#        creditorNameAndAddress: # N.A. for all, but can be used by ASPSP if needed
+#          $ref: "#/components/schemas/creditorNameAndAddress"
+#        ultimateCreditor: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
+#        purposeCode: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/purposeCode"
+#        chargeBearer: #In some payment product N.A. in some Optional in some conditional
+#          $ref: "#/components/schemas/chargeBearer"
         remittanceInformationUnstructured:
           $ref: "#/components/schemas/remittanceInformationUnstructured"
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-
-    paymentInitiationSctInstBulkElement_json:
-      description: |
-        Body for a SCT INST payment initation.
-      type: object
-      required:
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-
-    paymentInitiationTarget2BulkElement_json:
-      description: |
-        Body for a bulk TARGET-2 payment initation.
-      type: object
-      required:
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-
-    paymentInitiationCrossBorderBulkElement_json:
-      description: |
-        JSON body for a cross-border payment initation.
-      type: object
-      required:
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-#        endToEndIdentification: # N.A.
-#          type: string
-#          maxLength: 35
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount:
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode:  # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
+#        remittanceInformationUnstructuredArray:
+#          $ref: "#/components/schemas/remittanceInformationUnstructuredArray"
+#        remittanceInformationStructured: # N.A. for all, but can be used by ASPSP if needed
 #          $ref: "#/components/schemas/remittanceInformationStructured"
 
 
-    periodicPaymentInitiationSct_json:
+    periodicPaymentInitiation_json: 
       description: |
-        JSON Body for a periodic SCT payment initation.
+        Generic Body for a periodic payment initation via JSON.
+        
+        This generic JSON body can be used to represent valid periodic payment initiations for the following JSON based payment product, 
+        which where defined in the Implementation Guidelines:
+        
+          * sepa-credit-transfers
+          * instant-sepa-credit-transfers
+          * target-2-payments
+          * cross-border-credit-transfers
+        
+        For the convenience of the implementer additional which are already predefinded in the Implementation Guidelines 
+        are included (but commented in source code), such that an ASPSP may add them easily.
+        
+        Take care: Since the format is intended to fit for all payment products 
+        there are additional conditions which are NOT covered by this specification.
+        Please check the Implementation Guidelines for detailes.
+
+        
+        The following data element are depending on the actual payment product available (in source code):
+                  
+         <table style="width:100%">
+         <tr><th>Data Element</th><th>SCT EU Core</th><th>SCT INST EU Core</th><th>Target2 Paym. Core</th><th>Cross Border CT Core</th></tr>
+         <tr><td>endToEndIdentification</td><td> optional</td> <td>optional</td> <td>optional</td> <td>n.a.</td> </tr>
+         <tr><td>debtorAccount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>debtorId</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>ultimateDebtor</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>instructedAmount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>transactionCurrency</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>exchangeRateInformation</td> <td>n.a.</td> <td>n.a.</td><td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorAccount</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>creditorAgent</td> <td>optional</td> <td>optional</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>creditorAgentName</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorName</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>creditorId</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>creditorAddress</td>optional</td> <td>optional</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>creditorNameAndAddress</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>ultimateCreditor</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>purposeCode</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>chargeBearer</td> <td>n.a.</td> <td>n.a.</td> <td>optional</td> <td>conditional </td> </tr>
+         <tr><td>remittanceInformationUnstructured</td> <td>optional</td> <td>optional</td> <td> optional</td> <td>optional</td> </tr>
+         <tr><td>remittanceInformationUnstructuredArray</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>remittanceInformationStructured</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>requestedExecutionDate</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>requestedExecutionTime</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> <td>n.a.</td> </tr>
+         <tr><td>startDate</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>executionRule</td> <td>optional</td> <td>optional</td> <td>optional</td> <td>optional</td> </tr>
+         <tr><td>endDate</td> <td>optional</td> <td>optional</td> <td>optional</td> <td>optional</td> </tr>
+         <tr><td>frequency</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> <td>mandatory</td> </tr>
+         <tr><td>dayOfExecution</td> <td>conditional</td> <td>conditional</td> <td>conditional</td> <td>conditional</td> </tr>
+            </td></tr>
+          </table>
+          
+        IMPORTANT: In this API definition the following holds:
+          *  All data elements mentioned above are defined, but some of them are commented, 
+            i.e. they are only visible in the source code and can be used by uncommenting them.
+          * Data elements which are mandatory in the table above for all payment products 
+            are set to be mandatory in this specification.
+          * Data elements which are indicated in the table above as n.a. for all payment products are commented in the source code.
+          * Data elements which are indicated to be option, conditional or mandatory for at least one payment product 
+            in the table above are set to be optional in the s specification except the case where all are definde to be mandatory. 
+          * Data element which are inticated to be n.a. can be used by the ASPS if needed. 
+            In this case uncomment tthe the relatetd lines in the source code.
+          * If one uses this data types for some payment products he has to ensure that the used data type is 
+            valid according to the underlying payment product, e.g. by some appropriate validations.
+
       type: object
       required:
         - debtorAccount
@@ -5711,6 +5890,8 @@ components:
 #          $ref: "#/components/schemas/purposeCode"
         remittanceInformationUnstructured:
           $ref: "#/components/schemas/remittanceInformationUnstructured"
+#        remittanceInformationUnstructuredArray:
+#          $ref: "#/components/schemas/remittanceInformationUnstructuredArray"
 #        remittanceInformationStructured:  # N.A.
 #          $ref: "#/components/schemas/remittanceInformationStructured"
 #        requestedExecutionDate: # N.A.
@@ -5731,258 +5912,43 @@ components:
         dayOfExecution:
           $ref: "#/components/schemas/dayOfExecution"
 
-    periodicPaymentInitiationSctInst_json:
-      description: |
-        JSON Body for a periodic SCT INST payment initation.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-        - startDate
-        - frequency
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured:
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        #Additional Information for periodic payments
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        executionRule:
-          $ref: "#/components/schemas/executionRule"
-        frequency:
-          $ref: "#/components/schemas/frequencyCode"
-        dayOfExecution:
-          $ref: "#/components/schemas/dayOfExecution"
 
-    periodicPaymentInitiationTarget2_json:
+    bulkPaymentInitiation_json: 
       description: |
-        JSON Body for a periodic target-2 payment initation.
+        Generic Body for a bulk payment initation via JSON.
+        
+        paymentInformationId is contained in code but commented since it is n.a. 
+        and not all ASPSP are able to support this field now.
+        In a later version the field will be mandatory.
       type: object
       required:
+        - payments
         - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-        - startDate
-        - frequency
+        #- paymentInformationId
       properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
+        batchBookingPreferred:
+          $ref: "#/components/schemas/batchBookingPreferred"
+        debtorAccount:
           $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured:
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        #Additional Information for periodic payments
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        executionRule:
-          $ref: "#/components/schemas/executionRule"
-        frequency:
-          $ref: "#/components/schemas/frequencyCode"
-        dayOfExecution:
-          $ref: "#/components/schemas/dayOfExecution"
-
-    periodicPaymentInitiationCrossBorder_json:
-      description: |
-        JSON body for a periodic cross-border payment initation.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-        - startDate
-        - frequency
-      properties:
-#        endToEndIdentification: # N.A.
+#        paymentInformationId:
+#          description: |
+#            Unique identification as assigned by the sending party to unambiguously identify this bulk payment.
 #          type: string
 #          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount:
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode:  # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        #Additional Information for periodic payments
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        executionRule:
-          $ref: "#/components/schemas/executionRule"
-        frequency:
-          $ref: "#/components/schemas/frequencyCode"
-        dayOfExecution:
-          $ref: "#/components/schemas/dayOfExecution"
-
-    bulkPaymentInitiationSct_json:
-      description: |
-        JSON Body for a bulk SCT payment initation.
-      type: object
-      required:
-        - payments
-        - debtorAccount
-      properties:
-        batchBookingPreferred:
-          $ref: "#/components/schemas/batchBookingPreferred"
         requestedExecutionDate:
           type: string
           format: date
-        debtorAccount:
-          $ref: "#/components/schemas/accountReference"
-        payments:
-          description: A list of JSON bodies for SCT payments.
-          type: array
-          items:
-            $ref: "#/components/schemas/paymentInitiationSctBulkElement_json"
-      
-    bulkPaymentInitiationSctInst_json:
-      description: |
-        JSON Body for a bulk SCT INST payment initation.
-      type: object
-      required:
-        - payments
-        - debtorAccount
-      properties:
-        batchBookingPreferred:
-          $ref: "#/components/schemas/batchBookingPreferred"
-        requestedExecutionDate:
+        requestedExecutionTime:
           type: string
-          format: date
-        debtorAccount:
-          $ref: "#/components/schemas/accountReference"
+          format: date-time
         payments:
-          description: A list of JSON bodies for SCT INST payments.
+          description: |
+            A list of generic JSON bodies payment initations for bulk payments via JSON.
+            
+            Note: Some fields from single payments do not occcur in a bulk payment element
           type: array
           items:
-            $ref: "#/components/schemas/paymentInitiationSctInstBulkElement_json"
-
-    bulkPaymentInitiationTarget2_json:
-      description: |
-        JSON Body for a bulk TARGET-2 payment initation.
-      type: object
-      required:
-        - payments
-        - debtorAccount
-      properties:
-        batchBookingPreferred:
-          $ref: "#/components/schemas/batchBookingPreferred"
-        requestedExecutionDate:
-          type: string
-          format: date
-        debtorAccount:
-          $ref: "#/components/schemas/accountReference"
-        payments:
-          description: A list of JSON bodies for TARGET-2 payments.
-          type: array
-          items:
-            $ref: "#/components/schemas/paymentInitiationTarget2BulkElement_json"
-
-
-    bulkPaymentInitiationCrossBorder_json:
-      description: |
-        JSON body for a bulk cross-border payment initation.
-      type: object
-      required:
-        - payments
-        - debtorAccount
-      properties:
-        batchBookingPreferred:
-          $ref: "#/components/schemas/batchBookingPreferred"
-        requestedExecutionDate:
-          type: string
-          format: date
-        debtorAccount:
-          $ref: "#/components/schemas/accountReference"
-        payments:
-          description: A List of JSON bodies for cross-border payments.
-          type: array
-          items:
-            $ref: "#/components/schemas/paymentInitiationCrossBorderBulkElement_json"
+            $ref: "#/components/schemas/paymentInitiationBulkElement_json"
 
 
     confirmationOfFunds:
@@ -6025,6 +5991,7 @@ components:
             Card Number of the card issued by the PIISP. 
             Should be delivered if available.
           type: string
+          maxLength: 35
         account:
           $ref: "#/components/schemas/accountReference"
         payee:
@@ -6297,7 +6264,7 @@ components:
             $ref: "#/components/schemas/tppMessage2XX"
 
 
-    paymentInitiationCancelResponse-204_202:
+    paymentInitiationCancelResponse-202:
       description: Body of the response for a successful cancel payment request.
       type: object
       required:
@@ -6315,9 +6282,9 @@ components:
           $ref: "#/components/schemas/_linksPaymentInitiationCancel"
 
 
-    paymentInitiationSctWithStatusResponse:
+    paymentInitiationWithStatusResponse: 
       description: |
-        JSON response body consistion of the corresponding SCT payment initation JSON body together with an optional transaction status field.
+        Generic JSON response body consistion of the corresponding payment initation JSON body together with an optional transaction status field.
       type: object
       required:
         - debtorAccount
@@ -6348,97 +6315,8 @@ components:
 #          $ref: "#/components/schemas/purposeCode"
         remittanceInformationUnstructured:
           $ref: "#/components/schemas/remittanceInformationUnstructured"
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-    paymentInitiationSctInstWithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding SCT INST payment initation JSON body together with an optional transaction status field.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-    paymentInitiationTarget2WithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding TARGET-2 payment initation JSON body together with an 
-        optional transaction status field.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
+#        remittanceInformationUnstructuredArray:
+#          $ref: "#/components/schemas/remittanceInformationUnstructuredArray"
 #        remittanceInformationStructured: # N.A.
 #          $ref: "#/components/schemas/remittanceInformationStructured"
 #        requestedExecutionDate: # N.A.
@@ -6451,55 +6329,9 @@ components:
           $ref: "#/components/schemas/transactionStatus"
 
 
-    paymentInitiationCrossBorderWithStatusResponse:
+    periodicPaymentInitiationWithStatusResponse: 
       description: |
-        JSON response body consistion of the corresponding cross-border payment initation JSON body together with an optional transaction status field.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-      properties:
-#        endToEndIdentification: # N.A.
-#          type: string
-#          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount:
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode:  # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-
-    periodicPaymentInitiationSctWithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding periodic SCT payment initation JSON body together with an optional transaction status field.
+        Generic JSON response body consistion of the corresponding periodic payment initation JSON body together with an optional transaction status field.
       type: object
       required:
         - debtorAccount
@@ -6532,6 +6364,8 @@ components:
 #          $ref: "#/components/schemas/purposeCode"
         remittanceInformationUnstructured:
           $ref: "#/components/schemas/remittanceInformationUnstructured"
+#        remittanceInformationUnstructuredArray:
+#          $ref: "#/components/schemas/remittanceInformationUnstructuredArray"
 #        remittanceInformationStructured: # N.A.
 #          $ref: "#/components/schemas/remittanceInformationStructured"
 #        requestedExecutionDate:
@@ -6555,186 +6389,9 @@ components:
           $ref: "#/components/schemas/transactionStatus"
 
 
-    periodicPaymentInitiationSctInstWithStatusResponse:
+    bulkPaymentInitiationWithStatusResponse: 
       description: |
-        JSON response body consistion of the corresponding periodic SCT INST payment initation JSON body together with an optional transaction status field.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-        - startDate
-        - frequency
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured:
-          $ref: "#/components/schemas/remittanceInformationUnstructured"
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        #Additional Information for periodic payments
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        executionRule:
-          $ref: "#/components/schemas/executionRule"
-        frequency:
-          $ref: "#/components/schemas/frequencyCode"
-        dayOfExecution:
-          $ref: "#/components/schemas/dayOfExecution"
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-
-    periodicPaymentInitiationTarget2WithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding periodic TARGET-2 payment initation JSON body together with 
-        an optional transaction status field.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-        - startDate
-        - frequency
-      properties:
-        endToEndIdentification:
-          type: string
-          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount: 
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode: # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured:
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        #Additional Information for periodic payments
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        executionRule:
-          $ref: "#/components/schemas/executionRule"
-        frequency:
-          $ref: "#/components/schemas/frequencyCode"
-        dayOfExecution:
-          $ref: "#/components/schemas/dayOfExecution"
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-
-    periodicPaymentInitiationCrossBorderWithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding periodic cross-border payment initation JSON body together with an optional transaction status field.
-      type: object
-      required:
-        - debtorAccount
-        - instructedAmount
-        - creditorAccount
-        - creditorName
-        - startDate
-        - frequency
-      properties:
-#        endToEndIdentification: # N.A.
-#          type: string
-#          maxLength: 35
-        debtorAccount: 
-          $ref: "#/components/schemas/accountReference"
-#        ultimateDebtor: # N.A.
-#          $ref: "#/components/schemas/ultimateDebtor"
-        instructedAmount:
-          $ref: "#/components/schemas/amount"
-        creditorAccount:
-          $ref: "#/components/schemas/accountReference"
-        creditorAgent:
-          $ref: "#/components/schemas/bicfi"
-        creditorName:
-          $ref: "#/components/schemas/creditorName"
-        creditorAddress:
-          $ref: "#/components/schemas/address"
-#        ultimateCreditor: # N.A.
-#          $ref: "#/components/schemas/ultimateCreditor"
-#        purposeCode:  # N.A.
-#          $ref: "#/components/schemas/purposeCode"
-        remittanceInformationUnstructured: 
-          type: string
-          maxLength: 140
-#        remittanceInformationStructured: # N.A.
-#          $ref: "#/components/schemas/remittanceInformationStructured"
-#        requestedExecutionDate: # N.A.
-#          type: string
-#          format: date
-#        requestedExecutionTime: # N.A.
-#          type: string
-#          format: date-time
-        #Additional Information for periodic payments
-        startDate:
-          $ref: "#/components/schemas/startDate"
-        endDate:
-          $ref: "#/components/schemas/endDate"
-        executionRule:
-          $ref: "#/components/schemas/executionRule"
-        frequency:
-          $ref: "#/components/schemas/frequencyCode"
-        dayOfExecution:
-          $ref: "#/components/schemas/dayOfExecution"
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-
-    bulkPaymentInitiationSctWithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding bulk SCT payment initation JSON body together with an optional transaction status field.
+        Generic JSON response body consistion of the corresponding bulk payment initation JSON body together with an optional transaction status field.
       type: object
       required:
         - payments
@@ -6748,83 +6405,16 @@ components:
         debtorAccount:
           $ref: "#/components/schemas/accountReference"
         payments:
-          description: A list of JSON bodies for SCT payments.
+          description: |
+            A list of generic JSON bodies payment initations for bulk payments via JSON.
+            
+            Note: Some fields from single payments do not occcur in a bulk payment element
           type: array
           items:
-            $ref: "#/components/schemas/paymentInitiationSct_json"
+            $ref: "#/components/schemas/paymentInitiationBulkElement_json"
         transactionStatus:
           $ref: "#/components/schemas/transactionStatus"
 
-
-    bulkPaymentInitiationSctInstWithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding bulk SCT INST payment initation JSON body together with an optional transaction status field.
-      type: object
-      required:
-        - payments
-        - debtorAccount
-      properties:
-        batchBookingPreferred:
-          $ref: "#/components/schemas/batchBookingPreferred"
-        requestedExecutionDate:
-          type: string
-          format: date
-        debtorAccount:
-          $ref: "#/components/schemas/accountReference"
-        payments:
-          description: A list of JSON bodies for SCT INST payments.
-          type: array
-          items:
-            $ref: "#/components/schemas/paymentInitiationSctInst_json"
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-    bulkPaymentInitiationTarget2WithStatusResponse:
-      description: |
-        JSON response body consistion of the corresponding bulk TARGET-2 payment initation JSON body together with an optional transaction status field.
-      type: object
-      required:
-        - payments
-        - debtorAccount
-      properties:
-        batchBookingPreferred:
-          $ref: "#/components/schemas/batchBookingPreferred"
-        requestedExecutionDate:
-          type: string
-          format: date
-        debtorAccount:
-          $ref: "#/components/schemas/accountReference"
-        payments:
-          description: A list of JSON bodies for TARGET-2 payments.
-          type: array
-          items:
-            $ref: "#/components/schemas/paymentInitiationTarget2_json"
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
-
-
-    bulkPaymentInitiationCrossBorderWithStatusResponse: 
-      description: |
-        JSON response body consistion of the corresponding bulk cross-border payment initation JSON body together with an optional transaction status field.
-      type: object
-      required:
-        - payments
-        - debtorAccount
-      properties:
-        batchBookingPreferred:
-          $ref: "#/components/schemas/batchBookingPreferred"
-        requestedExecutionDate:
-          type: string
-          format: date
-        debtorAccount:
-          $ref: "#/components/schemas/accountReference"
-        payments:
-          description: A list of JSON bodies for cross-border payments.
-          type: array
-          items:
-            $ref: "#/components/schemas/paymentInitiationCrossBorder_json"
-        transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
 
     scaStatusResponse:
       description: Body of the JSON response with SCA Status
@@ -6915,6 +6505,7 @@ components:
           * 'payments': payment initiations which shall be authorised through this signing basket.
           * 'consents': consent objects which shall be authorised through this signing basket.
           * 'transactionStatus': Only the codes RCVD, ACTC, RJCT are used.
+          * '_links': The ASPSP might integrate hyperlinks to indicate next (authorisation) steps to be taken.
         
       type: object
       required:
@@ -6925,7 +6516,10 @@ components:
         consents:
           $ref: "#/components/schemas/consentIdList"
         transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
+          $ref: "#/components/schemas/transactionStatus_SBS"
+        _links:
+          $ref: "#/components/schemas/_linksSigningBasket"
+
 
     signingBasketStatusResponse-200:
       type: object
@@ -6933,7 +6527,7 @@ components:
         - transactionStatus
       properties:
         transactionStatus:
-          $ref: "#/components/schemas/transactionStatus_SB"
+          $ref: "#/components/schemas/transactionStatus_SBS"
 
 
     signingBasketResponse-201:
@@ -6945,7 +6539,7 @@ components:
         - _links
       properties:
         transactionStatus:
-          $ref: "#/components/schemas/transactionStatus"
+          $ref: "#/components/schemas/transactionStatus_SBS"
         basketId:
           $ref: "#/components/schemas/basketId"
         scaMethods:
@@ -7731,7 +7325,7 @@ components:
         - "ERROR"
         - "WARNING"
 
-    MessageCode2XX: #TODO: Ask os wether it should be included or not
+    MessageCode2XX: 
       description: Message codes for HTTP Error codes 2XX.
       type: string
       enum: 
@@ -7794,7 +7388,7 @@ components:
         - "NO_PIIS_ACTIVATION"        #PIIS
 
 
-    MessageCode400_SB: 
+    MessageCode400_SBS: 
       description: Message codes defined for signing baskets for HTTP Error code 400 (BAD_REQUEST).
       type: string
       enum: 
@@ -7809,7 +7403,7 @@ components:
         - "PERIOD_INVALID"            #gen
         - "SCA_METHOD_UNKNOWN"        #gen
         - "CONSENT_UNKNOWN"           #gen
-        - "REFERENCE_MIX_INVALID"     #SB
+        - "REFERENCE_MIX_INVALID"     #SBS
 
 
     MessageCode401_PIS: 
@@ -7873,7 +7467,7 @@ components:
         - "TOKEN_EXPIRED"             #gen
 
 
-    MessageCode401_SB: 
+    MessageCode401_SBS: 
       description: Message codes defined for signing baskets for HTTP Error code 401 (UNAUTHORIZED).
       type: string
       enum: 
@@ -7923,7 +7517,7 @@ components:
         - "RESOURCE_EXPIRED"          #gen
 
 
-    MessageCode403_SB: 
+    MessageCode403_SBS: 
       description: Message codes defined for signing baskets for HTTP Error code 403 (FORBIDDEN).
       type: string
       enum: 
@@ -7955,7 +7549,7 @@ components:
         - "RESOURCE_UNKNOWN"          #gens
 
 
-    MessageCode404_SB: 
+    MessageCode404_SBS: 
       description: Message codes defined for signing baskets for HTTP Error code 404 (NOT FOUND).
       type: string
       enum: 
@@ -7988,8 +7582,8 @@ components:
       enum: 
         - "SERVICE_INVALID"           #gens
 
-    MessageCode405_SB: 
-      description: Message codes defined for SB for HTTP Error code 405 (METHOD NOT ALLOWED).
+    MessageCode405_SBS: 
+      description: Message codes defined for SBS for HTTP Error code 405 (METHOD NOT ALLOWED).
       type: string
       enum: 
         - "SERVICE_INVALID"           #gens
@@ -8020,11 +7614,11 @@ components:
       enum: 
         - "STATUS_INVALID"            #gen
 
-    MessageCode409_SB: 
+    MessageCode409_SBS: 
       description: Message codes defined for signing baskets for HTTP Error code 409 (CONFLICT).
       type: string
       enum: 
-        - "REFERENCE_STATUS_INVALID"  #SB
+        - "REFERENCE_STATUS_INVALID"  #SBS
         - "STATUS_INVALID"            #gen
 
 
@@ -8047,7 +7641,7 @@ components:
       maxLength: 512
 
 
-    tppMessage2XX: #TODO Ask Ortwin whether do it or not
+    tppMessage2XX: 
       type: object
       required:
         - category
@@ -8111,7 +7705,7 @@ components:
           $ref: "#/components/schemas/tppMessageText"
 
 
-    tppMessage400_SB:
+    tppMessage400_SBS:
       type: object
       required:
         - category
@@ -8120,7 +7714,7 @@ components:
         category:
            $ref: "#/components/schemas/tppMessageCategory"
         code:
-          $ref: "#/components/schemas/MessageCode400_SB"
+          $ref: "#/components/schemas/MessageCode400_SBS"
         path:
           type: string
         text:
@@ -8174,7 +7768,7 @@ components:
           $ref: "#/components/schemas/tppMessageText"
 
 
-    tppMessage401_SB:
+    tppMessage401_SBS:
       type: object
       required:
         - category
@@ -8183,7 +7777,7 @@ components:
         category:
            $ref: "#/components/schemas/tppMessageCategory"
         code:
-          $ref: "#/components/schemas/MessageCode401_SB"
+          $ref: "#/components/schemas/MessageCode401_SBS"
         path:
           type: string
         text:
@@ -8238,7 +7832,7 @@ components:
           $ref: "#/components/schemas/tppMessageText"
 
 
-    tppMessage403_SB:
+    tppMessage403_SBS:
       type: object
       required:
         - category
@@ -8247,12 +7841,11 @@ components:
         category:
            $ref: "#/components/schemas/tppMessageCategory"
         code:
-          $ref: "#/components/schemas/MessageCode403_SB"
+          $ref: "#/components/schemas/MessageCode403_SBS"
         path:
           type: string
         text:
           $ref: "#/components/schemas/tppMessageText"
-
 
 
     tppMessage404_PIS:
@@ -8303,7 +7896,7 @@ components:
           $ref: "#/components/schemas/tppMessageText"
 
 
-    tppMessage404_SB:
+    tppMessage404_SBS:
       type: object
       required:
         - category
@@ -8312,7 +7905,7 @@ components:
         category:
            $ref: "#/components/schemas/tppMessageCategory"
         code:
-          $ref: "#/components/schemas/MessageCode404_SB"
+          $ref: "#/components/schemas/MessageCode404_SBS"
         path:
           type: string
         text:
@@ -8383,7 +7976,7 @@ components:
           $ref: "#/components/schemas/tppMessageText"
 
 
-    tppMessage405_SB:
+    tppMessage405_SBS:
       type: object
       required:
         - category
@@ -8392,7 +7985,7 @@ components:
         category:
            $ref: "#/components/schemas/tppMessageCategory"
         code:
-          $ref: "#/components/schemas/MessageCode405_SB"
+          $ref: "#/components/schemas/MessageCode405_SBS"
         path:
           type: string
         text:
@@ -8464,7 +8057,7 @@ components:
           $ref: "#/components/schemas/tppMessageText"
 
 
-    tppMessage409_SB:
+    tppMessage409_SBS:
       type: object
       required:
         - category
@@ -8473,7 +8066,7 @@ components:
         category:
            $ref: "#/components/schemas/tppMessageCategory"
         code:
-          $ref: "#/components/schemas/MessageCode409_SB"
+          $ref: "#/components/schemas/MessageCode409_SBS"
         path:
           type: string
         text:
@@ -8687,7 +8280,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error400_SB: 
+    Error400_SBS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807] 
         in case of a HTTP error code 400 for signing baskets.
@@ -8718,7 +8311,7 @@ components:
           type: string
           maxLength: 512
         code:
-          $ref: "#/components/schemas/MessageCode400_SB"
+          $ref: "#/components/schemas/MessageCode400_SBS"
         additionalErrors:
           description: |
             Array of Error Information Blocks.
@@ -8736,7 +8329,7 @@ components:
               detail:
                 $ref: "#/components/schemas/tppErrorDetail"
               code:
-                $ref: "#/components/schemas/MessageCode400_SB"
+                $ref: "#/components/schemas/MessageCode400_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -8903,7 +8496,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error401_SB: 
+    Error401_SBS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807] 
         in case of a HTTP error code 401 for signing baskets.
@@ -8934,7 +8527,7 @@ components:
           type: string
           maxLength: 512
         code:
-          $ref: "#/components/schemas/MessageCode401_SB"
+          $ref: "#/components/schemas/MessageCode401_SBS"
         additionalErrors:
           description: |
             Array of Error Information Blocks.
@@ -8952,7 +8545,7 @@ components:
               detail:
                 $ref: "#/components/schemas/tppErrorDetail"
               code:
-                $ref: "#/components/schemas/MessageCode401_SB"
+                $ref: "#/components/schemas/MessageCode401_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -9119,7 +8712,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error403_SB: 
+    Error403_SBS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807] 
         in case of a HTTP error code 403 for signing baskets.
@@ -9150,7 +8743,7 @@ components:
           type: string
           maxLength: 512
         code:
-          $ref: "#/components/schemas/MessageCode403_SB"
+          $ref: "#/components/schemas/MessageCode403_SBS"
         additionalErrors:
           description: |
             Array of Error Information Blocks.
@@ -9168,7 +8761,7 @@ components:
               detail:
                 $ref: "#/components/schemas/tppErrorDetail"
               code:
-                $ref: "#/components/schemas/MessageCode403_SB"
+                $ref: "#/components/schemas/MessageCode403_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -9335,7 +8928,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error404_SB: 
+    Error404_SBS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807] 
         in case of a HTTP error code 404 for signing baskets.
@@ -9366,7 +8959,7 @@ components:
           type: string
           maxLength: 512
         code:
-          $ref: "#/components/schemas/MessageCode404_SB"
+          $ref: "#/components/schemas/MessageCode404_SBS"
         additionalErrors:
           description: |
             Array of Error Information Blocks.
@@ -9384,7 +8977,7 @@ components:
               detail:
                 $ref: "#/components/schemas/tppErrorDetail"
               code:
-                $ref: "#/components/schemas/MessageCode404_SB"
+                $ref: "#/components/schemas/MessageCode404_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -9605,7 +9198,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error405_SB: 
+    Error405_SBS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807] 
         in case of a HTTP error code 405 for signing baskets.
@@ -9636,7 +9229,7 @@ components:
           type: string
           maxLength: 512
         code:
-          $ref: "#/components/schemas/MessageCode405_SB"
+          $ref: "#/components/schemas/MessageCode405_SBS"
         additionalErrors:
           description: |
             Array of Error Information Blocks.
@@ -9654,7 +9247,7 @@ components:
               detail:
                 $ref: "#/components/schemas/tppErrorDetail"
               code:
-                $ref: "#/components/schemas/MessageCode405_SB"
+                $ref: "#/components/schemas/MessageCode405_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -9875,7 +9468,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error409_SB: 
+    Error409_SBS: 
       description: |
         Standardised definition of reporting error information according to [RFC7807] 
         in case of a HTTP error code 409 for signing baskets.
@@ -9906,7 +9499,7 @@ components:
           type: string
           maxLength: 512
         code:
-          $ref: "#/components/schemas/MessageCode409_SB"
+          $ref: "#/components/schemas/MessageCode409_SBS"
         additionalErrors:
           description: |
             Array of Error Information Blocks.
@@ -9924,7 +9517,7 @@ components:
               detail:
                 $ref: "#/components/schemas/tppErrorDetail"
               code:
-                $ref: "#/components/schemas/MessageCode409_SB"
+                $ref: "#/components/schemas/MessageCode409_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -10026,7 +9619,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error400_NG_SB: 
+    Error400_NG_SBS: 
       description: |
         NextGenPSD2 specific definition of reporting error information in case of a HTTP error code 400.
       type: object
@@ -10034,7 +9627,7 @@ components:
         tppMessages:
           type: array
           items:
-            $ref: "#/components/schemas/tppMessage400_SB"
+            $ref: "#/components/schemas/tppMessage400_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -10079,7 +9672,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error401_NG_SB: 
+    Error401_NG_SBS: 
       description: |
         NextGenPSD2 specific definition of reporting error information in case of a HTTP error code 401.
       type: object
@@ -10087,7 +9680,7 @@ components:
         tppMessages:
           type: array
           items:
-            $ref: "#/components/schemas/tppMessage401_SB"
+            $ref: "#/components/schemas/tppMessage401_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -10131,7 +9724,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error403_NG_SB: 
+    Error403_NG_SBS: 
       description: |
         NextGenPSD2 specific definition of reporting error information in case of a HTTP error code 403.
       type: object
@@ -10139,7 +9732,7 @@ components:
         tppMessages:
           type: array
           items:
-            $ref: "#/components/schemas/tppMessage403_SB"
+            $ref: "#/components/schemas/tppMessage403_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -10183,7 +9776,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error404_NG_SB: 
+    Error404_NG_SBS: 
       description: |
         NextGenPSD2 specific definition of reporting error information in case of a HTTP error code 404.
       type: object
@@ -10191,7 +9784,7 @@ components:
         tppMessages:
           type: array
           items:
-            $ref: "#/components/schemas/tppMessage404_SB"
+            $ref: "#/components/schemas/tppMessage404_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
 
@@ -10248,7 +9841,7 @@ components:
           $ref: "#/components/schemas/_linksAll"
 
 
-    Error405_NG_SB: 
+    Error405_NG_SBS: 
       description: |
         NextGenPSD2 specific definition of reporting error information in case of a HTTP error code 401.
       type: object
@@ -10256,7 +9849,7 @@ components:
         tppMessages:
           type: array
           items:
-            $ref: "#/components/schemas/tppMessage405_SB"
+            $ref: "#/components/schemas/tppMessage405_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
           
@@ -10331,7 +9924,7 @@ components:
         }]
 
 
-    Error409_NG_SB: 
+    Error409_NG_SBS: 
       description: |
         NextGenPSD2 specific definition of reporting error information in case of a HTTP error code 409.
       type: object
@@ -10339,7 +9932,7 @@ components:
         tppMessages:
           type: array
           items:
-            $ref: "#/components/schemas/tppMessage409_SB"
+            $ref: "#/components/schemas/tppMessage409_SBS"
         _links:
           $ref: "#/components/schemas/_linksAll"
       example:
@@ -10692,7 +10285,7 @@ components:
       description: |
         URI of the TPP, where the transaction flow shall be redirected to after a Redirect.
         
-        Mandated for the Redirect SCA Approach (including OAuth2 SCA approach), specifically 
+        Mandated for the Redirect SCA Approach, specifically 
         when TPP-Redirect-Preferred equals "true".
         It is recommended to always use this header field.
         
@@ -10735,13 +10328,35 @@ components:
         #type: boolean
       required: false
 
+    TPP-Rejection-NoFunds-Preferred:
+      name: TPP-Rejection-NoFunds-Preferred
+      in: header
+      description: |
+        If it equals "true" then the TPP prefers a rejection of the payment initiation in case the ASPSP is 
+        providing an integrated confirmation of funds request an the result of this is that not sufficient 
+        funds are available.
+        
+        If it equals "false" then the TPP prefers that the ASPSP is dealing with the payment initiation like 
+        in the ASPSPs online channel, potentially waiting for a certain time period for funds to arrive to initiate the payment.
+
+        This parameter might be ignored by the ASPSP.
+
+      schema:
+        type: string
+        enum:
+          - "true"
+          - "false"
+        #type: boolean
+      required: false
+
+
 
     PSU-ID: 
       name: PSU-ID
       in: header
       description: |
         Client ID of the PSU in the ASPSP client interface. Might be mandated in the ASPSP's documentation.
-        Is not contained if an OAuth2 based authentication was performed in a pre-step or an OAuth2 based SCA was performed in an preceeding
+        Is not contained if an OAuth2 based authentication was performed in a pre-step or an OAuth2 based SCA was performed in an preceding
         AIS service in the same session.
       schema:
         type: string
@@ -10919,9 +10534,9 @@ components:
         The forwarded Geo Location of the corresponding http request between PSU and TPP if available.
       schema:
         type: string
-        pattern: '(GEO:)[0-9]{1,3}\.[-][0-9]{6}\,[-][0-9]{1,3}\.[0-9]{6}'
+        pattern: 'GEO:-?[0-9]{1,2}\.[0-9]{6};-?[0-9]{1,3}\.[0-9]{6}'
       required: false
-      example: GEO:52.506931,13.144558
+      example: GEO:52.506931;13.144558
 
 
 
@@ -10957,19 +10572,10 @@ components:
       content: 
         application/json:
           schema:
-            oneOf: 
-              - $ref: "#/components/schemas/paymentInitiationSct_json"
-              - $ref: "#/components/schemas/paymentInitiationSctInst_json"
-              - $ref: "#/components/schemas/paymentInitiationTarget2_json"
-              - $ref: "#/components/schemas/paymentInitiationCrossBorder_json"
-              - $ref: "#/components/schemas/periodicPaymentInitiationSct_json"
-              - $ref: "#/components/schemas/periodicPaymentInitiationSctInst_json"
-              - $ref: "#/components/schemas/periodicPaymentInitiationTarget2_json"
-              - $ref: "#/components/schemas/periodicPaymentInitiationCrossBorder_json"
-              - $ref: "#/components/schemas/bulkPaymentInitiationSct_json"
-              - $ref: "#/components/schemas/bulkPaymentInitiationSctInst_json"
-              - $ref: "#/components/schemas/bulkPaymentInitiationTarget2_json"
-              - $ref: "#/components/schemas/bulkPaymentInitiationCrossBorder_json"
+            oneOf: #Different Payment products in JSON
+              - $ref: "#/components/schemas/paymentInitiation_json"
+              - $ref: "#/components/schemas/periodicPaymentInitiation_json"
+              - $ref: "#/components/schemas/bulkPaymentInitiation_json"
               
               
           examples:
@@ -11091,19 +10697,10 @@ components:
       content:
         application/json:
            schema:
-            oneOf: 
-              - $ref: "#/components/schemas/paymentInitiationSctWithStatusResponse"
-              - $ref: "#/components/schemas/paymentInitiationSctInstWithStatusResponse"
-              - $ref: "#/components/schemas/paymentInitiationTarget2WithStatusResponse"
-              - $ref: "#/components/schemas/paymentInitiationCrossBorderWithStatusResponse"
-              - $ref: "#/components/schemas/periodicPaymentInitiationSctWithStatusResponse"
-              - $ref: "#/components/schemas/periodicPaymentInitiationSctInstWithStatusResponse"
-              - $ref: "#/components/schemas/periodicPaymentInitiationTarget2WithStatusResponse"
-              - $ref: "#/components/schemas/periodicPaymentInitiationCrossBorderWithStatusResponse"
-              - $ref: "#/components/schemas/bulkPaymentInitiationSctWithStatusResponse"
-              - $ref: "#/components/schemas/bulkPaymentInitiationSctInstWithStatusResponse"
-              - $ref: "#/components/schemas/bulkPaymentInitiationTarget2WithStatusResponse"
-              - $ref: "#/components/schemas/bulkPaymentInitiationCrossBorderWithStatusResponse"
+            oneOf:  #Different Payment Products with status
+              - $ref: "#/components/schemas/paymentInitiationWithStatusResponse"
+              - $ref: "#/components/schemas/periodicPaymentInitiationWithStatusResponse"
+              - $ref: "#/components/schemas/bulkPaymentInitiationWithStatusResponse"
               
         application/xml:
           schema:
@@ -11307,9 +10904,9 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/readCardAccountBalanceResponse-200"
-          #examples: #TODO
-#            "Example:":
-#              $ref: "#/components/examples//components/examples/balancesExample_CardAcount"
+          examples: 
+            "Example:":
+              $ref: "#/components/examples/balancesExample_CardAccount"
 
     OK_200_AccountsTransactions:
       description: OK
@@ -11341,7 +10938,7 @@ components:
               The ASPSP will decide on the format due to the chosen parameters, 
               specifically on the chosen dates relative to the time of the request. 
               In addition the ASPSP might offer camt.054x structure e.g. in a corporate setting.
-            oneOf:
+            oneOf: #Different camt messages
               - $ref: "#/components/schemas/camt.052"
               - $ref: "#/components/schemas/camt.053"
               - $ref: "#/components/schemas/camt.054"
@@ -11357,7 +10954,7 @@ components:
               The MT942 may include pending payments which are not yet finally booked. 
               The ASPSP will decide on the format due to the chosen parameters, 
               specifically on the chosen dates relative to the time of the request.
-            oneOf:
+            oneOf: #Different MT94x
               - $ref: "#/components/schemas/mt940"
               - $ref: "#/components/schemas/mt942"
 
@@ -11419,7 +11016,7 @@ components:
         application/json:
           schema:
           
-            oneOf: 
+            oneOf: #Different Authorisation Bodies
               - $ref: "#/components/schemas/updatePsuIdenticationResponse" #Update PSU Identification
               - $ref: "#/components/schemas/updatePsuAuthenticationResponse" #Update PSU Authentication
               - $ref: "#/components/schemas/selectPsuAuthenticationMethodResponse" #Select Authentication Method
@@ -11522,7 +11119,7 @@ components:
       content:
         application/json:
           schema:
-            oneOf:
+            oneOf: #Single- and Multilevel Responses
               - $ref: "#/components/schemas/paymentInitationRequestResponse-201"
               - $ref: "#/components/schemas/paymentInitationRequestMultiLevelScaResponse-201"
           examples:
@@ -11595,26 +11192,20 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/paymentInitiationCancelResponse-204_202"
+            $ref: "#/components/schemas/paymentInitiationCancelResponse-202"
           examples:
             Example:
               $ref: "#/components/examples/paymentInitiationCancelResponse-202"
 
 
     NO_CONTENT_204_PaymentInitiationCancel:
-      description: OK
+      description:  No Content
       
       headers:
         X-Request-ID:
           $ref: "#/components/headers/X-Request-ID"
-      
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/paymentInitiationCancelResponse-204_202"
-          examples:
-            Example:
-              $ref: "#/components/examples/paymentInitiationCancelResponse-204_202"
+      #NO RESPONSE BODY
+
 
     NO_CONTENT_204_Consents:
       description: No Content
@@ -11694,7 +11285,7 @@ components:
             $ref: "#/components/schemas/Error400_AIS" 
 
 
-    BAD_REQUEST_400_SB:
+    BAD_REQUEST_400_SBS:
       description: Bad Request
       
       headers:
@@ -11706,11 +11297,11 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error400_NG_SB" 
+            $ref: "#/components/schemas/Error400_NG_SBS" 
 
         application/problem+json:
           schema:
-            $ref: "#/components/schemas/Error400_SB" 
+            $ref: "#/components/schemas/Error400_SBS" 
 
 
     UNAUTHORIZED_401_PIS:
@@ -11767,7 +11358,7 @@ components:
           schema:
              $ref: "#/components/schemas/Error401_PIIS" 
 
-    UNAUTHORIZED_401_SB:
+    UNAUTHORIZED_401_SBS:
       description: Unauthorized
       
       headers:
@@ -11779,11 +11370,11 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error401_NG_SB" 
+            $ref: "#/components/schemas/Error401_NG_SBS" 
 
         application/problem+json:
           schema:
-             $ref: "#/components/schemas/Error401_SB" 
+             $ref: "#/components/schemas/Error401_SBS" 
             
 
     FORBIDDEN_403_PIS:
@@ -11843,7 +11434,7 @@ components:
              $ref: "#/components/schemas/Error403_PIIS" 
 
 
-    FORBIDDEN_403_SB:
+    FORBIDDEN_403_SBS:
       description: Forbidden
       
       headers:
@@ -11855,11 +11446,11 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error403_NG_SB" 
+            $ref: "#/components/schemas/Error403_NG_SBS" 
 
         application/problem+json:
           schema:
-             $ref: "#/components/schemas/Error403_SB" 
+             $ref: "#/components/schemas/Error403_SBS" 
 
 
     NOT_FOUND_404_PIS:
@@ -11875,7 +11466,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Error404_NG_PIS" 
-
 
         application/problem+json:
           schema:
@@ -11920,7 +11510,7 @@ components:
              $ref: "#/components/schemas/Error404_PIIS" 
 
 
-    NOT_FOUND_404_SB:
+    NOT_FOUND_404_SBS:
       description: Not found
       
       headers:
@@ -11932,11 +11522,11 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error404_NG_SB" 
+            $ref: "#/components/schemas/Error404_NG_SBS" 
 
         application/problem+json:
           schema:
-             $ref: "#/components/schemas/Error404_SB" 
+             $ref: "#/components/schemas/Error404_SBS" 
 
 
     METHOD_NOT_ALLOWED_405_PIS:
@@ -12015,7 +11605,7 @@ components:
              $ref: "#/components/schemas/Error405_PIIS" 
 
 
-    METHOD_NOT_ALLOWED_405_SB:
+    METHOD_NOT_ALLOWED_405_SBS:
       description: Method Not Allowed
       
       headers:
@@ -12027,11 +11617,11 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Error405_NG_SB" 
+            $ref: "#/components/schemas/Error405_NG_SBS" 
 
         application/problem+json:
           schema:
-             $ref: "#/components/schemas/Error405_SB" 
+             $ref: "#/components/schemas/Error405_SBS" 
 
 
     NOT_ACCEPTABLE_406_PIS:
@@ -12075,7 +11665,7 @@ components:
       #No Response body because there are no valid message codes for PIIS in case of HTTP code 406
 
 
-    NOT_ACCEPTABLE_406_SB:
+    NOT_ACCEPTABLE_406_SBS:
       description: Not Acceptable
       
       headers:
@@ -12119,7 +11709,7 @@ components:
       #No Response body because there are no valid message codes for PIIS in case of HTTP code 408
 
 
-    REQUEST_TIMEOUT_408_SB: 
+    REQUEST_TIMEOUT_408_SBS: 
       description: Request Timeout
       
       headers:
@@ -12184,7 +11774,7 @@ components:
              $ref: "#/components/schemas/Error409_PIIS"
 
 
-    CONFLICT_409_SB: 
+    CONFLICT_409_SBS: 
       description: Conflict
       
       headers:
@@ -12195,11 +11785,11 @@ components:
       content:
         application/json:
           schema:
-             $ref: "#/components/schemas/Error409_NG_SB"
+             $ref: "#/components/schemas/Error409_NG_SBS"
           
         application/problem+json:
           schema:
-             $ref: "#/components/schemas/Error409_SB"
+             $ref: "#/components/schemas/Error409_SBS"
 
 
     UNSUPPORTED_MEDIA_TYPE_415_AIS:
@@ -12235,7 +11825,7 @@ components:
       #No Response body because there are no valid message codes for PIIS in case of HTTP code 415 
 
 
-    UNSUPPORTED_MEDIA_TYPE_415_SB:
+    UNSUPPORTED_MEDIA_TYPE_415_SBS:
       description: Unsupported Media Type
       
       headers:
@@ -12289,7 +11879,7 @@ components:
       #No Response body because there are no valid message codes for PIIS in case of HTTP code 429 
 
 
-    TOO_MANY_REQUESTS_429_SB:
+    TOO_MANY_REQUESTS_429_SBS:
       description: Too Many Requests
       
       headers:
@@ -12331,7 +11921,7 @@ components:
       #No Response body because there are no valid message codes for PIIS in case of HTTP code 500 
 
 
-    INTERNAL_SERVER_ERROR_500_SB:
+    INTERNAL_SERVER_ERROR_500_SBS:
       description: Internal Server Error
       headers:
         Location:
@@ -12371,7 +11961,7 @@ components:
       #No Response body because there are no valid message codes for PIIS in case of HTTP code 503
 
 
-    SERVICE_UNAVAILABLE_503_SB:
+    SERVICE_UNAVAILABLE_503_SBS:
       description: Service Unavailable
       headers:
         Location:
@@ -12512,7 +12102,7 @@ components:
         "creditorAccount": {"iban": "DE23100120020123456789"},
         "remittanceInformationUnstructured": "Ref Number Abonnement",
         "startDate": "2018-03-01",
-        "executionRule": "latest",
+        "executionRule": "preceding",
         "frequency": "monthly",
         "dayOfExecution": "01"
         }
@@ -12524,6 +12114,7 @@ components:
         {
         "batchBookingPreferred": "true",
         "debtorAccount": {"iban": "DE40100100103307118608"},
+        "paymentInformationId": "my-bulk-identification-1234",
         "requestedExecutionDate": "2018-08-01",
         "payments": 
           [
@@ -12551,7 +12142,7 @@ components:
               "iban": "FR7612345987650123456789014", 
               "currency": "EUR",
               "product": "Girokonto",
-              "cashAccountType": "CurrentAccount",
+              "cashAccountType": "CACC",
               "name": "Main Account",
               "_links": 
                 {
@@ -12572,7 +12163,7 @@ components:
               "iban": "FR7612345987650123456789014", 
               "currency": "XXX",
               "product": "Multicurrency Account",
-              "cashAccountType": "CurrentAccount",
+              "cashAccountType": "CACC",
               "name": "Aggregation Account",
               "_links": 
                 {
@@ -12593,7 +12184,7 @@ components:
                "iban": "DE2310010010123456789", 
                "currency": "EUR",
                "product": "Girokonto",
-               "cashAccountType": "CurrentAccount",
+               "cashAccountType": "CACC",
                "name": "Main Account",
                "_links": {
             "balances": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e80f/balances"},
@@ -12602,8 +12193,8 @@ components:
               {"resourceId": "3dc3d5b3-7023-4848-9853-f5400a64e81g",
                "iban": "DE2310010010123456788",
                "currency": "USD",
-               "product": "Fremdw?hrungskonto",
-               "cashAccountType": "CurrentAccount",
+               "product": "Fremdwährungskonto",
+               "cashAccountType": "CACC",
                "name": "US Dollar Account",
                "_links": {
             "balances": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e81g/balances" }}
@@ -12622,7 +12213,7 @@ components:
                "iban": "DE2310010010123456788", 
                "currency": "EUR",
                "product": "Girokonto",
-               "cashAccountType": "CurrentAccount",
+               "cashAccountType": "CACC",
                "name": "Main Account",
                "_links": {
             "balances": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e80f/balances"},
@@ -12631,8 +12222,8 @@ components:
               {"resourceId": "3dc3d5b3-7023-4848-9853-f5400a64e81g",
                "iban": "DE2310010010123456788",
                "currency": "USD",
-               "product": "Fremdw?hrungskonto",
-               "cashAccountType": "CurrentAccount",
+               "product": "Fremdwährungskonto",
+               "cashAccountType": "CACC",
                "name": "US Dollar Account",
                "_links": {
                  "balances": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e81g/balances"},
@@ -12654,7 +12245,7 @@ components:
                "iban": "DE2310010010123456788", 
                "currency": "XXX",
                "product": "Multi currency account",
-               "cashAccountType": "CurrentAccount",
+               "cashAccountType": "CACC",
                "name": "Aggregation Account",
                "_links": {
             "balances": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e333/balances"},
@@ -12664,7 +12255,7 @@ components:
                "iban": "DE2310010010123456788", 
                "currency": "EUR",
                "product": "Girokonto",
-               "cashAccountType": "CurrentAccount",
+               "cashAccountType": "CACC",
                "name": "Main Account",
                "_links": {
             "balances": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e80f/balances"},
@@ -12673,8 +12264,8 @@ components:
               {"resourceId": "3dc3d5b3-7023-4848-9853-f5400a64e81g",
                "iban": "DE2310010010123456788",
                "currency": "USD",
-               "product": "Fremdw?hrungskonto",
-               "cashAccountType": "CurrentAccount",
+               "product": "Fremdwährungskonto",
+               "cashAccountType": "CACC",
                "name": "US Dollar Account",
                "_links": {
             "balances": {"href": "/v1/accounts/3dc3d5b3-7023-4848-9853-f5400a64e81g/balances"},
@@ -12697,14 +12288,14 @@ components:
             "name": "Main",
             "product": "Basic Credit",
             "status": "enabled",
-            "creditLimit": { "currency": "EUR", "amount": 15000 },
+            "creditLimit": { "currency": "EUR", "amount": "15000" },
             "balances": [
               {
                 "balanceType": "interimBooked",
-                "balanceAmount": { "currency": "EUR", "amount": 14355.78 }
+                "balanceAmount": { "currency": "EUR", "amount": "14355.78" }
               },{
-                "balanceType": "nonBilled",
-                "balanceAmount": { "currency": "EUR", "amount": 4175.86 }
+                "balanceType": "nonInvoiced",
+                "balanceAmount": { "currency": "EUR", "amount": "4175.86" }
               }
             ],
             "_links": {
@@ -12731,14 +12322,14 @@ components:
             "name": "Main",
             "product": "Basic Credit",
             "status": "enabled",
-            "creditLimit": { "currency": "EUR", "amount": 15000 },
+            "creditLimit": { "currency": "EUR", "amount": "15000" },
             "balances": [
               {
                 "balanceType": "interimBooked",
-                "balanceAmount": { "currency": "EUR", "amount": 14355.78 }
+                "balanceAmount": { "currency": "EUR", "amount": "14355.78" }
               },{
-                "balanceType": "nonBilled",
-                "balanceAmount": { "currency": "EUR", "amount": 4175.86 }
+                "balanceType": "nonInvoiced",
+                "balanceAmount": { "currency": "EUR", "amount": "4175.86" }
               }
             ],
             "_links": {
@@ -13055,13 +12646,6 @@ components:
         }
 
 
-    paymentInitiationCancelResponse-204_202:
-      value:
-        {
-          "transactionStatus": "CANC"
-        }
-
-
     paymentInitiationCancelResponse-202:
       value:
         {
@@ -13191,6 +12775,23 @@ components:
                "balanceAmount": {"currency": "USD", "amount": "350.00"},
                "lastChangeDateTime": "2017-10-24T14:30:21Z"
                    }]
+        }
+
+    balancesExample_CardAccount:
+      description: |
+        Response in case of card Acoount balance request
+      value: 
+        {
+          "cardAccount": {"maskedPan": "525412******3241"},
+          "balances":[
+            {
+              "balanceType": "interimBooked",
+              "balanceAmount": { "currency": "EUR", "amount": "14355.78" }
+            },{
+              "balanceType": "nonInvoiced",
+              "balanceAmount": { "currency": "EUR", "amount": "4175.86" }
+            }
+          ]
         }
 
 
@@ -13347,9 +12948,9 @@ tags:
         * Balances of a given account or card account ,
         * A list of available accounts or card account ,
         * Account details of a given account or card account or of the list of all accessible accounts or card account  relative to a granted consent
-  - name: Signing Baskets
+  - name: Signing Baskets Service (SBS)
     description: |
-      Signing basket mathods are used for authorising several transactions with one SCA method. 
+      Signing basket methods are used for authorising several transactions and resp. or consents with one SCA operation. 
   - name: Common Services
     description: |
       Processes on starting authorisations, update PSU identification or PSU authentication data and explicit 
